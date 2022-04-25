@@ -22,13 +22,13 @@ hace que la cantidad de huevos inicial sea 0 y intentarReproducirse aumenta en 1
 Respuesta: Nos quedó código repetido inicialmente en hacerQueElHabitatTengaLosRecursosSuficientes y en retrocederElHabitatAlInicioDeLosTiempos
 cuando queriamos reiniciar la cantidad de huevos para cada avispa, lo solucionamos cambiando la forma en la que guardamos los huevos e iteramos
 por la estructura elegida (un diccionario) para poder poner en 0 los huevos de las avispas y resetear la cantidad de orugas y de polillas.
-La cosa del dominio que nos faltó representar fue que los huevos se comportan de igual forma cuando reseteamos el habitat, es decor, todos se van a 0
+La cosa del dominio que nos faltó representar fue que los huevos se comportan de igual forma cuando reseteamos el habitat, es decir, todos se van a 0
 
 4. Responsabilidad de dejar un huevo consumiendo otro insecto ¿Quién les quedó, en su modelo, que es el responsable de ver si hay suficientes
 polillas u orugas y entonces dejar un huevo? ¿el insecto (Polly, Oriana, etc) o el hábitat? ¿por qué? ¿por qué tendría sentido que fuera
 de la otra forma? ¿con cuál nos quedamos?
 
-Respuesta: En nuestro modelo quedo como responsable de esta accion las polillas, ya que las que ponen huevos son ellas, y para eso antes
+Respuesta: En nuestro modelo quedo como responsable de esta accion las avispas, ya que las que ponen huevos son ellas, y para eso antes
 de que lo hagan se fijan si hay suficientes orugas/polillas/huevos antes de proceder. Tendría sentido de que de esto se encargue el hábitat
 ya que es el lugar donde los recursos tambien viven, y el hábitat sabe de su existencia (ya que la cantidad de polillas, orugas y huevos son
 colaboradores internos del habitat). Pero nos quedamos con nuestra implementación, nos parece más semejante a la realidad que la otra
@@ -42,7 +42,7 @@ Respuesta: Lo que haria sería hacer un objeto Avispa y hacer objetos hijos que 
 Pero la pregunta más importante: ¿es lo más sencillo que hacía falta? ¿o se podía hacer menos y todo andaba?
 
 Respuesta: el tema de la cantidad de los huevos lo resolvimos guardándolos en un diccionario, donde las claves de este son su genética y
-el valor es la cantidad de huevos que tienen esa genética. Hizo falta uno solo ya que nos daba la información de los huevos de cada avispa y
+el valor es la cantidad de huevos que tienen esa genética. Hizo falta un solo diccionario ya que nos daba la información de los huevos de cada avispa y
 la suma de los huevos (los valores del diccionario) nos daba la cantidad de huevos total.
 En cuanto a si era más sencillo o no, fue más dificil de implementar que si hubiesemos hecho distintos colaboradores internos del hábitat que
 sean la cantidad de huevos con X genética, pero sin dudas creemos que es más eficiente y ordenado.
