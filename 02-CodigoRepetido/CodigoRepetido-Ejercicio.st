@@ -21,9 +21,30 @@ TestCase subclass: #CustomerBookTest
 	poolDictionaries: ''
 	category: 'CodigoRepetido-Ejercicio'!
 
+!CustomerBookTest methodsFor: 'testing' stamp: 'FR 5/1/2022 17:53:19'!
+assertNumberOfCustomers: total active: numberOfActive suspended: numberOfSuspended of: aCustomerBook.
+
+	self assert: numberOfActive equals: aCustomerBook numberOfActiveCustomers.
+	self assert: numberOfSuspended equals: aCustomerBook numberOfSuspendedCustomers.
+	self assert: total equals: aCustomerBook numberOfCustomers.
+! !
+
+!CustomerBookTest methodsFor: 'testing' stamp: 'FR 5/1/2022 17:11:52'!
+assertSizeOfCustomerBook: aNumberOfCustomers with: aName in: aCustomerBook
+	self assert: ( ( aCustomerBook numberOfCustomers = aNumberOfCustomers ) and: ( aCustomerBook includesCustomerNamed: aName ) ).
+! !
+
 !CustomerBookTest methodsFor: 'testing' stamp: 'Fr 4/30/2022 18:56:28'!
 createCustomerBookWith: aName
 	^CustomerBook new addCustomerNamed: aName .! !
+
+!CustomerBookTest methodsFor: 'testing' stamp: 'FR 5/1/2022 17:03:56'!
+createCustomerBookWithSuspended: aName
+	
+	| customerBook |
+	customerBook  := self createCustomerBookWith: aName.
+	customerBook suspendCustomerNamed: aName.
+	^customerBook! !
 
 !CustomerBookTest methodsFor: 'testing' stamp: 'Fr 4/30/2022 20:59:01'!
 executionTime: aClosure lessThan: numberOfMilliseconds
@@ -48,19 +69,23 @@ test02RemovingCustomerShouldNotTakeMoreThan100Milliseconds
 	self assert: (self executionTime: [ customerBook removeCustomerNamed: paulMcCartney ] lessThan: 100 )
 	! !
 
-!CustomerBookTest methodsFor: 'testing' stamp: 'Fr 4/30/2022 20:43:22'!
+!CustomerBookTest methodsFor: 'testing' stamp: 'FR 5/1/2022 17:59:46'!
 test03CanNotAddACustomerWithEmptyName 
 
 	| customerBook |
 	customerBook := CustomerBook new.
-	
+	"
 	[ customerBook addCustomerNamed: ''.
 	self fail ]
 		ifError: [ :anErrorMessage | 
-			self assert: anErrorMessage = ( 'Error: ' append: CustomerBook customerCanNotBeEmptyErrorMessage).
+			self assert: anErrorMessage = CustomerBook customerCanNotBeEmptyErrorMessage. 
+			self assert: customerBook isEmpty ]
+	"
+	self should: [ customerBook addCustomerNamed: ''.] raise: Error withExceptionDo: [ :anErrorMessage | 
+			self assert: anErrorMessage messageText = CustomerBook customerCanNotBeEmptyErrorMessage. 
 			self assert: customerBook isEmpty ]! !
 
-!CustomerBookTest methodsFor: 'testing' stamp: 'Fr 4/30/2022 19:47:52'!
+!CustomerBookTest methodsFor: 'testing' stamp: 'FR 5/1/2022 17:30:31'!
 test04CanNotRemoveAnInvalidCustomer
 	
 	| customerBook johnLennon |
@@ -71,50 +96,37 @@ test04CanNotRemoveAnInvalidCustomer
 	[ customerBook removeCustomerNamed: 'Paul McCartney'.
 	self fail ]
 		ifError:
-			[ self assert: customerBook numberOfCustomers = 1.
-			self assert: (customerBook includesCustomerNamed: johnLennon) ]
+			[ self assertSizeOfCustomerBook: 1 with: johnLennon in: customerBook ]
 ! !
 
-!CustomerBookTest methodsFor: 'testing' stamp: 'Fr 4/30/2022 19:00:51'!
+!CustomerBookTest methodsFor: 'testing' stamp: 'FR 5/1/2022 17:54:11'!
 test05SuspendingACustomerShouldNotRemoveItFromCustomerBook
 
 	| customerBook paulMcCartney|
 	
 	paulMcCartney := 'Paul McCartney'.
-	customerBook := self createCustomerBookWith: paulMcCartney.
-	customerBook suspendCustomerNamed: paulMcCartney.
+	customerBook := self createCustomerBookWithSuspended: paulMcCartney.
 	
-	self assert: 0 equals: customerBook numberOfActiveCustomers.
-	self assert: 1 equals: customerBook numberOfSuspendedCustomers.
-	self assert: 1 equals: customerBook numberOfCustomers.
+	self assertNumberOfCustomers: 1 active: 0 suspended: 1 of: customerBook.
 	self assert: (customerBook includesCustomerNamed: paulMcCartney).
 	
 
 	
 ! !
 
-!CustomerBookTest methodsFor: 'testing' stamp: 'NR 4/3/2019 10:50:28'!
+!CustomerBookTest methodsFor: 'testing' stamp: 'FR 5/1/2022 17:54:28'!
 test06RemovingASuspendedCustomerShouldRemoveItFromCustomerBook
 
 	| customerBook paulMcCartney|
 	
-	customerBook := CustomerBook new.
 	paulMcCartney := 'Paul McCartney'.
-	
-	customerBook addCustomerNamed: paulMcCartney.
-	customerBook suspendCustomerNamed: paulMcCartney.
+	customerBook  := self createCustomerBookWithSuspended: paulMcCartney .
 	customerBook removeCustomerNamed: paulMcCartney.
 	
-	self assert: 0 equals: customerBook numberOfActiveCustomers.
-	self assert: 0 equals: customerBook numberOfSuspendedCustomers.
-	self assert: 0 equals: customerBook numberOfCustomers.
-	self deny: (customerBook includesCustomerNamed: paulMcCartney).
+	self assertNumberOfCustomers: 0 active: 0 suspended: 0 of: customerBook.
+	self assert: (customerBook includesCustomerNamed: paulMcCartney) not.! !
 
-
-	
-! !
-
-!CustomerBookTest methodsFor: 'testing' stamp: 'NR 4/30/2020 09:08:46'!
+!CustomerBookTest methodsFor: 'testing' stamp: 'FR 5/1/2022 17:46:47'!
 test07CanNotSuspendAnInvalidCustomer
 	
 	| customerBook johnLennon |
@@ -125,13 +137,10 @@ test07CanNotSuspendAnInvalidCustomer
 	
 	[ customerBook suspendCustomerNamed: 'Ringo Starr'.
 	self fail ]
-		on: CantSuspend 
-		do: [ :anError | 
-			self assert: customerBook numberOfCustomers = 1.
-			self assert: (customerBook includesCustomerNamed: johnLennon) ]
+		ifError:[ self assertSizeOfCustomerBook: 1 with: johnLennon in: customerBook ]
 ! !
 
-!CustomerBookTest methodsFor: 'testing' stamp: 'NR 9/19/2018 17:57:11'!
+!CustomerBookTest methodsFor: 'testing' stamp: 'FR 5/1/2022 17:46:54'!
 test08CanNotSuspendAnAlreadySuspendedCustomer
 	
 	| customerBook johnLennon |
@@ -143,10 +152,7 @@ test08CanNotSuspendAnAlreadySuspendedCustomer
 	
 	[ customerBook suspendCustomerNamed: johnLennon.
 	self fail ]
-		on: CantSuspend 
-		do: [ :anError | 
-			self assert: customerBook numberOfCustomers = 1.
-			self assert: (customerBook includesCustomerNamed: johnLennon) ]
+		ifError: [ self assertSizeOfCustomerBook: 1 with: johnLennon in: customerBook ]
 ! !
 
 
@@ -176,7 +182,7 @@ initialize
 	suspended:= OrderedCollection new.! !
 
 
-!CustomerBook methodsFor: 'customer management' stamp: 'Fr 4/30/2022 20:31:22'!
+!CustomerBook methodsFor: 'customer management' stamp: 'FR 5/1/2022 18:01:06'!
 addCustomerNamed: aName
 
 	self nameIsEmpty: aName.
