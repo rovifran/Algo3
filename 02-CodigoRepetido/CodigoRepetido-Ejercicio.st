@@ -21,13 +21,13 @@ TestCase subclass: #CustomerBookTest
 	poolDictionaries: ''
 	category: 'CodigoRepetido-Ejercicio'!
 
-!CustomerBookTest methodsFor: 'testing' stamp: 'FR 5/1/2022 18:27:41'!
+!CustomerBookTest methodsFor: 'aux' stamp: 'FR 5/1/2022 18:27:41'!
 assertErrorMessage: anErrorMessage withNumberOfCustomers: aNumberOfCustomers of: aCustomerBook
 
 	self assert: anErrorMessage messageText = CustomerBook customerCanNotBeEmptyErrorMessage. 
 	self assert: aCustomerBook numberOfCustomers = aNumberOfCustomers ! !
 
-!CustomerBookTest methodsFor: 'testing' stamp: 'FR 5/1/2022 17:53:19'!
+!CustomerBookTest methodsFor: 'aux' stamp: 'FR 5/1/2022 17:53:19'!
 assertNumberOfCustomers: total active: numberOfActive suspended: numberOfSuspended of: aCustomerBook.
 
 	self assert: numberOfActive equals: aCustomerBook numberOfActiveCustomers.
@@ -35,16 +35,16 @@ assertNumberOfCustomers: total active: numberOfActive suspended: numberOfSuspend
 	self assert: total equals: aCustomerBook numberOfCustomers.
 ! !
 
-!CustomerBookTest methodsFor: 'testing' stamp: 'FR 5/1/2022 17:11:52'!
+!CustomerBookTest methodsFor: 'aux' stamp: 'FR 5/1/2022 17:11:52'!
 assertSizeOfCustomerBook: aNumberOfCustomers with: aName in: aCustomerBook
 	self assert: ( ( aCustomerBook numberOfCustomers = aNumberOfCustomers ) and: ( aCustomerBook includesCustomerNamed: aName ) ).
 ! !
 
-!CustomerBookTest methodsFor: 'testing' stamp: 'Fr 4/30/2022 18:56:28'!
+!CustomerBookTest methodsFor: 'aux' stamp: 'Fr 4/30/2022 18:56:28'!
 createCustomerBookWith: aName
 	^CustomerBook new addCustomerNamed: aName .! !
 
-!CustomerBookTest methodsFor: 'testing' stamp: 'FR 5/1/2022 17:03:56'!
+!CustomerBookTest methodsFor: 'aux' stamp: 'FR 5/1/2022 17:03:56'!
 createCustomerBookWithSuspended: aName
 	
 	| customerBook |
@@ -52,11 +52,12 @@ createCustomerBookWithSuspended: aName
 	customerBook suspendCustomerNamed: aName.
 	^customerBook! !
 
-!CustomerBookTest methodsFor: 'testing' stamp: 'FR 5/1/2022 18:41:37'!
+!CustomerBookTest methodsFor: 'aux' stamp: 'FR 5/1/2022 18:41:37'!
 executionTimeInMilliseconds: aClosure lessThan: numberOfMilliseconds
 
 	^( aClosure millisecondsToRun ) < ( numberOfMilliseconds * millisecond )
 	! !
+
 
 !CustomerBookTest methodsFor: 'testing' stamp: 'FR 5/1/2022 18:41:49'!
 test01AddingCustomerShouldNotTakeMoreThan50Milliseconds
