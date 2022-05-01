@@ -1,3 +1,4 @@
+
 # Código Repetido
 
 Este ejercicio tiene por objetivo que saquen el código repetido que encuentren en el modelo y en los tests. Por ej. entre el test01 y test02.
@@ -15,6 +16,8 @@ Aclaración: Para hacer este ejercicio más sencillo se modela a un Customer uti
 
 En los test 01 y 02 hay código repetido. Cuando lo extrajeron crearon algo nuevo. Eso es algo que estaba en la realidad y no estaba representado en nuestro código, por eso teníamos código repetido. ¿Cuál es esa entidad de la realidad que crearon?
 
+Respuesta: La entidad de la realidad que creamos es un cronómetro que cuenta los milisegundos que toma realizar una determinada  
+acción, en el caso de los primeros dos test lo que se queria realizar era añadir y borrar un cliente de un libro de clientes.
 
 ## Cómo representar en Smalltalk
 
