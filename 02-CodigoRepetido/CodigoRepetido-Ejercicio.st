@@ -21,6 +21,12 @@ TestCase subclass: #CustomerBookTest
 	poolDictionaries: ''
 	category: 'CodigoRepetido-Ejercicio'!
 
+!CustomerBookTest methodsFor: 'testing' stamp: 'FR 5/1/2022 18:27:41'!
+assertErrorMessage: anErrorMessage withNumberOfCustomers: aNumberOfCustomers of: aCustomerBook
+
+	self assert: anErrorMessage messageText = CustomerBook customerCanNotBeEmptyErrorMessage. 
+	self assert: aCustomerBook numberOfCustomers = aNumberOfCustomers ! !
+
 !CustomerBookTest methodsFor: 'testing' stamp: 'FR 5/1/2022 17:53:19'!
 assertNumberOfCustomers: total active: numberOfActive suspended: numberOfSuspended of: aCustomerBook.
 
@@ -46,46 +52,39 @@ createCustomerBookWithSuspended: aName
 	customerBook suspendCustomerNamed: aName.
 	^customerBook! !
 
-!CustomerBookTest methodsFor: 'testing' stamp: 'Fr 4/30/2022 20:59:01'!
-executionTime: aClosure lessThan: numberOfMilliseconds
+!CustomerBookTest methodsFor: 'testing' stamp: 'FR 5/1/2022 18:41:37'!
+executionTimeInMilliseconds: aClosure lessThan: numberOfMilliseconds
 
 	^( aClosure millisecondsToRun ) < ( numberOfMilliseconds * millisecond )
 	! !
 
-!CustomerBookTest methodsFor: 'testing' stamp: 'Fr 4/30/2022 21:01:09'!
+!CustomerBookTest methodsFor: 'testing' stamp: 'FR 5/1/2022 18:41:49'!
 test01AddingCustomerShouldNotTakeMoreThan50Milliseconds
 
-	self assert: (self executionTime: [ CustomerBook new addCustomerNamed: 'John Lennon' ] lessThan: 50) 
+	self assert: (self executionTimeInMilliseconds: [ CustomerBook new addCustomerNamed: 'John Lennon' ] lessThan: 50) 
 	
 ! !
 
-!CustomerBookTest methodsFor: 'testing' stamp: 'Fr 4/30/2022 21:00:02'!
+!CustomerBookTest methodsFor: 'testing' stamp: 'FR 5/1/2022 18:41:55'!
 test02RemovingCustomerShouldNotTakeMoreThan100Milliseconds
 
 	| customerBook paulMcCartney |
 	paulMcCartney := 'Paul McCartney'.
 	customerBook := self createCustomerBookWith: paulMcCartney. 
 	
-	self assert: (self executionTime: [ customerBook removeCustomerNamed: paulMcCartney ] lessThan: 100 )
+	self assert: (self executionTimeInMilliseconds: [ customerBook removeCustomerNamed: paulMcCartney ] lessThan: 100 )
 	! !
 
-!CustomerBookTest methodsFor: 'testing' stamp: 'FR 5/1/2022 17:59:46'!
+!CustomerBookTest methodsFor: 'testing' stamp: 'FR 5/1/2022 18:40:29'!
 test03CanNotAddACustomerWithEmptyName 
 
 	| customerBook |
 	customerBook := CustomerBook new.
-	"
-	[ customerBook addCustomerNamed: ''.
-	self fail ]
-		ifError: [ :anErrorMessage | 
-			self assert: anErrorMessage = CustomerBook customerCanNotBeEmptyErrorMessage. 
-			self assert: customerBook isEmpty ]
-	"
+	
 	self should: [ customerBook addCustomerNamed: ''.] raise: Error withExceptionDo: [ :anErrorMessage | 
-			self assert: anErrorMessage messageText = CustomerBook customerCanNotBeEmptyErrorMessage. 
-			self assert: customerBook isEmpty ]! !
+			self assertErrorMessage: anErrorMessage withNumberOfCustomers: 0 of: customerBook ]! !
 
-!CustomerBookTest methodsFor: 'testing' stamp: 'FR 5/1/2022 17:30:31'!
+!CustomerBookTest methodsFor: 'testing' stamp: 'FR 5/1/2022 18:30:21'!
 test04CanNotRemoveAnInvalidCustomer
 	
 	| customerBook johnLennon |
@@ -93,10 +92,8 @@ test04CanNotRemoveAnInvalidCustomer
 	johnLennon := 'John Lennon'.		
 	customerBook := self createCustomerBookWith: johnLennon.
 	
-	[ customerBook removeCustomerNamed: 'Paul McCartney'.
-	self fail ]
-		ifError:
-			[ self assertSizeOfCustomerBook: 1 with: johnLennon in: customerBook ]
+	self should: [ customerBook removeCustomerNamed: 'Paul McCartney'. ] raise: NotFound withExceptionDo:
+		[ :anErrorMessage |  self assertSizeOfCustomerBook: 1 with: johnLennon in: customerBook  ]
 ! !
 
 !CustomerBookTest methodsFor: 'testing' stamp: 'FR 5/1/2022 17:54:11'!
@@ -126,34 +123,28 @@ test06RemovingASuspendedCustomerShouldRemoveItFromCustomerBook
 	self assertNumberOfCustomers: 0 active: 0 suspended: 0 of: customerBook.
 	self assert: (customerBook includesCustomerNamed: paulMcCartney) not.! !
 
-!CustomerBookTest methodsFor: 'testing' stamp: 'FR 5/1/2022 17:46:47'!
+!CustomerBookTest methodsFor: 'testing' stamp: 'FR 5/1/2022 18:39:46'!
 test07CanNotSuspendAnInvalidCustomer
 	
 	| customerBook johnLennon |
 			
-	customerBook := CustomerBook new.
 	johnLennon := 'John Lennon'.
-	customerBook addCustomerNamed: johnLennon.
+	customerBook := self createCustomerBookWith: johnLennon.
 	
-	[ customerBook suspendCustomerNamed: 'Ringo Starr'.
-	self fail ]
-		ifError:[ self assertSizeOfCustomerBook: 1 with: johnLennon in: customerBook ]
+	self should: [ customerBook suspendCustomerNamed: 'Ringo Starr'. ] raise: CantSuspend withExceptionDo:
+		[:anError | self assertSizeOfCustomerBook: 1 with: johnLennon in: customerBook  ]
 ! !
 
-!CustomerBookTest methodsFor: 'testing' stamp: 'FR 5/1/2022 17:46:54'!
+!CustomerBookTest methodsFor: 'testing' stamp: 'FR 5/1/2022 18:39:06'!
 test08CanNotSuspendAnAlreadySuspendedCustomer
 	
 	| customerBook johnLennon |
 			
-	customerBook := CustomerBook new.
 	johnLennon := 'John Lennon'.
-	customerBook addCustomerNamed: johnLennon.
-	customerBook suspendCustomerNamed: johnLennon.
+	customerBook := self createCustomerBookWithSuspended: johnLennon.
 	
-	[ customerBook suspendCustomerNamed: johnLennon.
-	self fail ]
-		ifError: [ self assertSizeOfCustomerBook: 1 with: johnLennon in: customerBook ]
-! !
+	self should: [ customerBook suspendCustomerNamed: johnLennon. ] raise: CantSuspend withExceptionDo:
+		[:anError | self assertSizeOfCustomerBook: 1 with: johnLennon in: customerBook  ]! !
 
 
 !classDefinition: #CustomerBook category: 'CodigoRepetido-Ejercicio'!
