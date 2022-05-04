@@ -135,27 +135,22 @@ Object subclass: #Numero
 	poolDictionaries: ''
 	category: 'Numeros-Parte1-Ejercicio'!
 
-!Numero methodsFor: 'arithmetic operations' stamp: 'FR 5/3/2022 20:19:43'!
+!Numero methodsFor: 'arithmetic operations' stamp: 'FR 5/3/2022 22:16:23'!
 * aMultiplier 
-
-	(type = #Entero and: [aMultiplier type = #Entero]) ifTrue:	
-		[ ^self class with: value * aMultiplier integerValue ].
-		
-	(type = #Fraccion and: [aMultiplier type = #Fraccion]) ifTrue:
-		[ ^self class with: (numerator * aMultiplier numerator) over: (denominator * aMultiplier denominator) ].
-		
-	self error: 'Tipo de número no soportado'
-	
-	"type = #Entero ifTrue: [
+	"
+	type = #Entero ifTrue: [
 		aMultiplier type = #Entero ifTrue: [
-			cosas]
-		]
+			^self class with: value * aMultiplier integerValue ].
+		self error: self numberNotSupported.
+		].
 	type = #Fraccion ifTrue: [
 		aMultiplier type = #Fraccion ifTrue: [
-			cosas]
-		]
-	self error: ...
-	"! !
+			^self class with: (numerator * aMultiplier numerator) over: (denominator * aMultiplier denominator) ].
+		self error: self numberNotSupported.
+		]."
+	self subclassResponsibility.
+	
+	! !
 
 !Numero methodsFor: 'arithmetic operations' stamp: 'NR 9/9/2019 15:44:40'!
 + anAdder 
@@ -174,26 +169,26 @@ Object subclass: #Numero
 	self error: 'Tipo de número no soportado'
 	! !
 
-!Numero methodsFor: 'arithmetic operations' stamp: 'FR 5/3/2022 20:13:06'!
+!Numero methodsFor: 'arithmetic operations' stamp: 'FR 5/3/2022 21:58:29'!
 negated
 	
-	type negated.! !
+	^self subclassResponsibility.! !
 
 
-!Numero methodsFor: 'testing' stamp: 'FR 5/3/2022 19:29:55'!
+!Numero methodsFor: 'testing' stamp: 'FR 5/3/2022 21:53:37'!
 isNegative
 	
-	^type isNegative.! !
+	^self subclassResponsibility.! !
 
-!Numero methodsFor: 'testing' stamp: 'FR 5/3/2022 19:30:01'!
+!Numero methodsFor: 'testing' stamp: 'FR 5/3/2022 21:53:33'!
 isOne
 
-	^type isOne.! !
+	^self subclassResponsibility.! !
 
-!Numero methodsFor: 'testing' stamp: 'FR 5/3/2022 19:52:22'!
+!Numero methodsFor: 'testing' stamp: 'FR 5/3/2022 21:53:12'!
 isZero
 
-	^type isZero.! !
+	^self subclassResponsibility.! !
 
 
 !Numero methodsFor: 'initialization' stamp: 'FR 5/3/2022 19:52:06'!
@@ -272,6 +267,12 @@ greatestCommonDivisorWith: anEntero
 		
 	self error: 'Tipo de número no soportado'! !
 
+
+!Numero methodsFor: 'private' stamp: 'FR 5/3/2022 21:51:26'!
+numberNotSupported 
+
+	^'Tipo de número no soportado'.! !
+
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
 !classDefinition: 'Numero class' category: 'Numeros-Parte1-Ejercicio'!
@@ -318,27 +319,53 @@ Numero subclass: #Entero
 	poolDictionaries: ''
 	category: 'Numeros-Parte1-Ejercicio'!
 
-!Entero methodsFor: 'as yet unclassified' stamp: 'FR 5/3/2022 20:05:19'!
-hash
-	^value hash! !
+!Entero methodsFor: 'as yet unclassified' stamp: 'FR 5/3/2022 21:42:22'!
+porEntero: anInteger
 
-!Entero methodsFor: 'as yet unclassified' stamp: 'FR 5/3/2022 19:14:25'!
-isNegative
-	^value < 0! !
+	^self class with: value * anInteger integerValue.! !
 
-!Entero methodsFor: 'as yet unclassified' stamp: 'FR 5/3/2022 19:14:56'!
-isOne
-	^value = 1! !
 
-!Entero methodsFor: 'as yet unclassified' stamp: 'FR 5/3/2022 19:14:06'!
-isZero
-	^value = 0! !
+!Entero methodsFor: 'arithmetic operations' stamp: 'FR 5/3/2022 22:24:27'!
+* aMultiplier
+	
+	^ aMultiplier porEntero: self! !
 
-!Entero methodsFor: 'as yet unclassified' stamp: 'FR 5/3/2022 20:11:25'!
+!Entero methodsFor: 'arithmetic operations' stamp: 'FR 5/3/2022 20:11:25'!
 negated
 	^self * (self class with: -1)! !
 
-!Entero methodsFor: 'as yet unclassified' stamp: 'FR 5/3/2022 20:00:38'!
+!Entero methodsFor: 'arithmetic operations' stamp: 'FR 5/3/2022 22:13:55'!
+por: aMultiplier
+	"
+	aMultiplier type = #Entero ifTrue: [
+		aMultiplier porEntero: self
+		].
+	aMultiplier type = #Fraccion ifTrue: [
+		aMultiplier porEntero: self
+		]
+		"
+	! !
+
+
+!Entero methodsFor: 'comparing' stamp: 'FR 5/3/2022 20:05:19'!
+hash
+	^value hash! !
+
+
+!Entero methodsFor: 'testing' stamp: 'FR 5/3/2022 19:14:25'!
+isNegative
+	^value < 0! !
+
+!Entero methodsFor: 'testing' stamp: 'FR 5/3/2022 19:14:56'!
+isOne
+	^value = 1! !
+
+!Entero methodsFor: 'testing' stamp: 'FR 5/3/2022 19:14:06'!
+isZero
+	^value = 0! !
+
+
+!Entero methodsFor: 'printing' stamp: 'FR 5/3/2022 20:00:38'!
 printOn: aStream
 	aStream print: value! !
 
@@ -350,27 +377,44 @@ Numero subclass: #Fraccion
 	poolDictionaries: ''
 	category: 'Numeros-Parte1-Ejercicio'!
 
-!Fraccion methodsFor: 'as yet unclassified' stamp: 'FR 5/3/2022 20:05:19'!
-hash
-	^(numerator hash / denominator hash) hash! !
+!Fraccion methodsFor: 'as yet unclassified' stamp: 'FR 5/3/2022 22:23:15'!
+porEntero: anInteger
+	
+	^ self error: self numberNotSupported.! !
 
-!Fraccion methodsFor: 'as yet unclassified' stamp: 'FR 5/3/2022 19:17:41'!
-isNegative
-	^denominator < 0! !
 
-!Fraccion methodsFor: 'as yet unclassified' stamp: 'FR 5/3/2022 19:15:14'!
-isOne
-	^false! !
+!Fraccion methodsFor: 'arithmetic operations' stamp: 'FR 5/3/2022 20:41:35'!
+* aMultiplier
 
-!Fraccion methodsFor: 'as yet unclassified' stamp: 'FR 5/3/2022 19:15:07'!
-isZero
-	^false! !
+	aMultiplier type = #Fraccion ifTrue:
+		[ ^self class with: (numerator * aMultiplier numerator) over: (denominator * aMultiplier denominator) ].
+		
+	self error: 'Tipo de número no soportado'! !
 
-!Fraccion methodsFor: 'as yet unclassified' stamp: 'FR 5/3/2022 20:11:25'!
+!Fraccion methodsFor: 'arithmetic operations' stamp: 'FR 5/3/2022 20:11:25'!
 negated
 	^self class with: numerator * (self class with: -1) over: denominator ! !
 
-!Fraccion methodsFor: 'as yet unclassified' stamp: 'FR 5/3/2022 20:00:38'!
+
+!Fraccion methodsFor: 'comparing' stamp: 'FR 5/3/2022 20:05:19'!
+hash
+	^(numerator hash / denominator hash) hash! !
+
+
+!Fraccion methodsFor: 'testing' stamp: 'FR 5/3/2022 19:17:41'!
+isNegative
+	^denominator < 0! !
+
+!Fraccion methodsFor: 'testing' stamp: 'FR 5/3/2022 19:15:14'!
+isOne
+	^false! !
+
+!Fraccion methodsFor: 'testing' stamp: 'FR 5/3/2022 19:15:07'!
+isZero
+	^false! !
+
+
+!Fraccion methodsFor: 'printing' stamp: 'FR 5/3/2022 20:00:38'!
 printOn: aStream
 	aStream print: numerator;
 	nextPut: $/;
