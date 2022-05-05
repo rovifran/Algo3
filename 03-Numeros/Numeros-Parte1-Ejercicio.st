@@ -135,39 +135,17 @@ Object subclass: #Numero
 	poolDictionaries: ''
 	category: 'Numeros-Parte1-Ejercicio'!
 
-!Numero methodsFor: 'arithmetic operations' stamp: 'FR 5/3/2022 22:16:23'!
+!Numero methodsFor: 'arithmetic operations' stamp: 'FR 5/5/2022 11:23:44'!
 * aMultiplier 
-	"
-	type = #Entero ifTrue: [
-		aMultiplier type = #Entero ifTrue: [
-			^self class with: value * aMultiplier integerValue ].
-		self error: self numberNotSupported.
-		].
-	type = #Fraccion ifTrue: [
-		aMultiplier type = #Fraccion ifTrue: [
-			^self class with: (numerator * aMultiplier numerator) over: (denominator * aMultiplier denominator) ].
-		self error: self numberNotSupported.
-		]."
+	
 	self subclassResponsibility.
 	
 	! !
 
-!Numero methodsFor: 'arithmetic operations' stamp: 'NR 9/9/2019 15:44:40'!
+!Numero methodsFor: 'arithmetic operations' stamp: 'FR 5/5/2022 11:30:40'!
 + anAdder 
 	
-	(type = #Entero and: [anAdder type = #Entero]) ifTrue:
-		[ ^self class with: value + anAdder integerValue ].
-	
-	(type = #Fraccion and: [anAdder type = #Fraccion]) ifTrue:
-		[ | newNumerator newDenominator |
-		
-		newNumerator := (numerator * anAdder denominator) + (denominator * anAdder numerator).
-		newDenominator := denominator * anAdder denominator.
-		
-		^ self class with: newNumerator over: newDenominator ].
-	
-	self error: 'Tipo de número no soportado'
-	! !
+	self subclassResponsibility .! !
 
 !Numero methodsFor: 'arithmetic operations' stamp: 'FR 5/3/2022 21:58:29'!
 negated
@@ -319,32 +297,34 @@ Numero subclass: #Entero
 	poolDictionaries: ''
 	category: 'Numeros-Parte1-Ejercicio'!
 
-!Entero methodsFor: 'as yet unclassified' stamp: 'FR 5/3/2022 21:42:22'!
-porEntero: anInteger
-
-	^self class with: value * anInteger integerValue.! !
-
-
 !Entero methodsFor: 'arithmetic operations' stamp: 'FR 5/3/2022 22:24:27'!
 * aMultiplier
 	
 	^ aMultiplier porEntero: self! !
 
+!Entero methodsFor: 'arithmetic operations' stamp: 'FR 5/5/2022 11:30:50'!
++ anAdder
+
+	^ anAdder masEntero: self.! !
+
+!Entero methodsFor: 'arithmetic operations' stamp: 'FR 5/5/2022 11:28:55'!
+masFraccion: unaFraccion
+
+	^ self error: self numberNotSupported .! !
+
 !Entero methodsFor: 'arithmetic operations' stamp: 'FR 5/3/2022 20:11:25'!
 negated
 	^self * (self class with: -1)! !
 
-!Entero methodsFor: 'arithmetic operations' stamp: 'FR 5/3/2022 22:13:55'!
-por: aMultiplier
-	"
-	aMultiplier type = #Entero ifTrue: [
-		aMultiplier porEntero: self
-		].
-	aMultiplier type = #Fraccion ifTrue: [
-		aMultiplier porEntero: self
-		]
-		"
-	! !
+!Entero methodsFor: 'arithmetic operations' stamp: 'FR 5/3/2022 21:42:22'!
+porEntero: anInteger
+
+	^self class with: value * anInteger integerValue.! !
+
+!Entero methodsFor: 'arithmetic operations' stamp: 'FR 5/5/2022 11:23:09'!
+porFraccion: unaFraccion
+
+	^ self error: self numberNotSupported .! !
 
 
 !Entero methodsFor: 'comparing' stamp: 'FR 5/3/2022 20:05:19'!
@@ -365,6 +345,11 @@ isZero
 	^value = 0! !
 
 
+!Entero methodsFor: 'printing' stamp: 'FR 5/5/2022 11:26:17'!
+masEntero: anInteger
+	
+	^self class with: value + anInteger integerValue.! !
+
 !Entero methodsFor: 'printing' stamp: 'FR 5/3/2022 20:00:38'!
 printOn: aStream
 	aStream print: value! !
@@ -377,23 +362,44 @@ Numero subclass: #Fraccion
 	poolDictionaries: ''
 	category: 'Numeros-Parte1-Ejercicio'!
 
-!Fraccion methodsFor: 'as yet unclassified' stamp: 'FR 5/3/2022 22:23:15'!
-porEntero: anInteger
-	
-	^ self error: self numberNotSupported.! !
-
-
-!Fraccion methodsFor: 'arithmetic operations' stamp: 'FR 5/3/2022 20:41:35'!
+!Fraccion methodsFor: 'arithmetic operations' stamp: 'FR 5/5/2022 11:22:35'!
 * aMultiplier
 
-	aMultiplier type = #Fraccion ifTrue:
-		[ ^self class with: (numerator * aMultiplier numerator) over: (denominator * aMultiplier denominator) ].
+	^ aMultiplier porFraccion: self! !
+
+!Fraccion methodsFor: 'arithmetic operations' stamp: 'FR 5/5/2022 11:31:03'!
++ anAdder
+	
+	^ anAdder masFraccion: self.! !
+
+!Fraccion methodsFor: 'arithmetic operations' stamp: 'FR 5/5/2022 11:26:38'!
+masEntero: anInteger
+
+	^ self error: self numberNotSupported .! !
+
+!Fraccion methodsFor: 'arithmetic operations' stamp: 'FR 5/5/2022 11:28:31'!
+masFraccion: unaFraccion
+
+	 | newNumerator newDenominator |
 		
-	self error: 'Tipo de número no soportado'! !
+		newNumerator := (numerator * unaFraccion denominator) + (denominator * unaFraccion numerator).
+		newDenominator := denominator * unaFraccion denominator.
+		
+		^ self class with: newNumerator over: newDenominator ! !
 
 !Fraccion methodsFor: 'arithmetic operations' stamp: 'FR 5/3/2022 20:11:25'!
 negated
 	^self class with: numerator * (self class with: -1) over: denominator ! !
+
+!Fraccion methodsFor: 'arithmetic operations' stamp: 'FR 5/3/2022 22:23:15'!
+porEntero: anInteger
+	
+	^ self error: self numberNotSupported.! !
+
+!Fraccion methodsFor: 'arithmetic operations' stamp: 'FR 5/5/2022 11:18:18'!
+porFraccion: unaFraccion
+	
+	^ self class with: ( unaFraccion numerator * numerator) over: ( unaFraccion denominator * denominator ).! !
 
 
 !Fraccion methodsFor: 'comparing' stamp: 'FR 5/3/2022 20:05:19'!
