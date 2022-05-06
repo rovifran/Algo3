@@ -324,6 +324,16 @@ beAddedToAnFraccion: anAdder
 
 	self subclassResponsibility ! !
 
+!Numero methodsFor: 'arithmetic operations' stamp: 'MBM 5/6/2022 19:59:07'!
+multiplyAnEntero: anEntero.
+
+	self subclassResponsibility ! !
+
+!Numero methodsFor: 'arithmetic operations' stamp: 'MBM 5/6/2022 19:59:35'!
+multiplyAnFraccion: anFraccion
+
+	self subclassResponsibility ! !
+
 !Numero methodsFor: 'arithmetic operations' stamp: 'NR 9/23/2018 23:37:13'!
 negated
 	
@@ -374,10 +384,11 @@ Numero subclass: #Entero
 	poolDictionaries: ''
 	category: 'Numeros-Parte2-Ejercicio'!
 
-!Entero methodsFor: 'arithmetic operations' stamp: 'HernanWilkinson 5/7/2016 23:13'!
+!Entero methodsFor: 'arithmetic operations' stamp: 'MBM 5/6/2022 19:59:07'!
 * aMultiplier 
 	
-	^self class with: value * aMultiplier integerValue
+	^aMultiplier multiplyAnEntero: self.
+	"^self class with: value * aMultiplier integerValue"
 	! !
 
 !Entero methodsFor: 'arithmetic operations' stamp: 'MBM 5/5/2022 20:48:08'!
@@ -390,10 +401,15 @@ Numero subclass: #Entero
 	
 	^ self class with: value - aSubtrahend integerValue.! !
 
-!Entero methodsFor: 'arithmetic operations' stamp: 'HernanWilkinson 5/7/2016 23:14'!
+!Entero methodsFor: 'arithmetic operations' stamp: 'MBM 5/6/2022 20:05:31'!
 / aDivisor 
 	
-	^Fraccion with: self over: aDivisor! !
+	^aDivisor divideAnEntero: self.! !
+
+!Entero methodsFor: 'arithmetic operations' stamp: 'MBM 5/6/2022 20:03:39'!
+divideAnEntero: aDividend 
+	
+	^Fraccion with: aDividend over: self.! !
 
 !Entero methodsFor: 'arithmetic operations' stamp: 'HAW 9/24/2018 08:47:50'!
 fibonacci
@@ -408,6 +424,17 @@ fibonacci
 	
 	^ (self - one) fibonacci + (self - two) fibonacci
 		! !
+
+!Entero methodsFor: 'arithmetic operations' stamp: 'MBM 5/6/2022 19:59:07'!
+multiplyAnEntero: anEntero
+
+	^self class with: anEntero integerValue * value.
+	! !
+
+!Entero methodsFor: 'arithmetic operations' stamp: 'MBM 5/6/2022 19:59:35'!
+multiplyAnFraccion: anFraccion
+
+	^(anFraccion numerator * self) / anFraccion denominator ! !
 
 
 !Entero methodsFor: 'comparing' stamp: 'HernanWilkinson 5/7/2016 21:01'!
@@ -504,11 +531,12 @@ Numero subclass: #Fraccion
 	poolDictionaries: ''
 	category: 'Numeros-Parte2-Ejercicio'!
 
-!Fraccion methodsFor: 'arithmetic operations' stamp: 'HernanWilkinson 5/7/2016 23:14'!
+!Fraccion methodsFor: 'arithmetic operations' stamp: 'MBM 5/6/2022 19:59:35'!
 * aMultiplier 
 	
-	^(numerator * aMultiplier numerator) / (denominator * aMultiplier denominator)
-	! !
+	^aMultiplier multiplyAnFraccion: self.
+	"(aMultiplier isKindOf: Fraccion) ifTrue: [^(numerator * aMultiplier numerator) / (denominator * aMultiplier denominator)].
+	(aMultiplier isKindOf: Entero) ifTrue: [^(numerator * aMultiplier) / denominator ]."! !
 
 !Fraccion methodsFor: 'arithmetic operations' stamp: 'MBM 5/5/2022 20:54:32'!
 + anAdder 
@@ -533,6 +561,22 @@ Numero subclass: #Fraccion
 / aDivisor 
 	
 	^(numerator * aDivisor denominator) / (denominator * aDivisor numerator)! !
+
+!Fraccion methodsFor: 'arithmetic operations' stamp: 'MBM 5/6/2022 20:05:11'!
+divideAnEntero: aDividend
+
+	^aDividend multiplyAnFraccion: self inverted! !
+
+!Fraccion methodsFor: 'arithmetic operations' stamp: 'MBM 5/6/2022 20:00:38'!
+multiplyAnEntero: anEntero
+
+	^(anEntero * numerator) / (denominator).
+	! !
+
+!Fraccion methodsFor: 'arithmetic operations' stamp: 'MBM 5/6/2022 20:00:22'!
+multiplyAnFraccion: anFraccion
+	
+	^(anFraccion numerator * numerator) / (anFraccion denominator * denominator).! !
 
 
 !Fraccion methodsFor: 'comparing' stamp: 'HernanWilkinson 5/7/2016 20:42'!
@@ -607,6 +651,11 @@ beAddedToAnFraccion: aFraccion
 	newDenominator := denominator * aFraccion denominator.
 	
 	^newNumerator / newDenominator ! !
+
+!Fraccion methodsFor: 'as yet unclassified' stamp: 'MBM 5/6/2022 19:52:31'!
+inverted
+	
+	^Fraccion new initializeWith: (self denominator) over: (self numerator).! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
