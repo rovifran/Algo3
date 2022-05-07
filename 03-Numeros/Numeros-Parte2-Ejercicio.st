@@ -109,7 +109,7 @@ test16FraccionDividesEnteroCorrectly
 
 	self assert: twoTwentyfifth equals: twoFifth / five! !
 
-!NumeroTest methodsFor: 'tests' stamp: 'HernanWilkinson 5/7/2016 22:38'!
+!NumeroTest methodsFor: 'tests' stamp: 'FR 5/6/2022 20:43:43'!
 test17AFraccionCanBeEqualToAnEntero
 
 	self assert: two equals: four / two! !
@@ -396,10 +396,10 @@ Numero subclass: #Entero
 	
 	^anAdder beAddedToAnEntero: self.! !
 
-!Entero methodsFor: 'arithmetic operations' stamp: 'NR 9/23/2018 23:40:37'!
+!Entero methodsFor: 'arithmetic operations' stamp: 'FR 5/6/2022 21:06:11'!
 - aSubtrahend 
 	
-	^ self class with: value - aSubtrahend integerValue.! !
+	^ aSubtrahend subtractToAnEntero: self.! !
 
 !Entero methodsFor: 'arithmetic operations' stamp: 'MBM 5/6/2022 20:05:31'!
 / aDivisor 
@@ -436,6 +436,11 @@ multiplyAnFraccion: anFraccion
 
 	^(anFraccion numerator * self) / anFraccion denominator ! !
 
+!Entero methodsFor: 'arithmetic operations' stamp: 'FR 5/6/2022 21:02:25'!
+subtractToAnEntero: anEntero.
+
+	^ self class with: anEntero integerValue - value! !
+
 
 !Entero methodsFor: 'comparing' stamp: 'HernanWilkinson 5/7/2016 21:01'!
 = anObject
@@ -453,6 +458,11 @@ initializeWith: aValue
 	
 	value := aValue! !
 
+
+!Entero methodsFor: 'accessing' stamp: 'FR 5/6/2022 20:39:55'!
+divideAnFraccion: aDividend
+
+	^(aDividend numerator) / (aDividend denominator * self).! !
 
 !Entero methodsFor: 'accessing' stamp: 'HernanWilkinson 5/7/2016 21:02'!
 integerValue
@@ -557,15 +567,20 @@ Numero subclass: #Fraccion
 	^newNumerator / newDenominator 
 ! !
 
-!Fraccion methodsFor: 'arithmetic operations' stamp: 'HernanWilkinson 5/7/2016 23:14'!
+!Fraccion methodsFor: 'arithmetic operations' stamp: 'FR 5/6/2022 20:41:08'!
 / aDivisor 
 	
-	^(numerator * aDivisor denominator) / (denominator * aDivisor numerator)! !
+	^aDivisor divideAnFraccion: self.! !
 
 !Fraccion methodsFor: 'arithmetic operations' stamp: 'MBM 5/6/2022 20:05:11'!
 divideAnEntero: aDividend
 
 	^aDividend multiplyAnFraccion: self inverted! !
+
+!Fraccion methodsFor: 'arithmetic operations' stamp: 'FR 5/6/2022 20:34:53'!
+divideAnFraccion: anFraccion
+	^(anFraccion numerator * denominator) / (anFraccion denominator * numerator).
+	! !
 
 !Fraccion methodsFor: 'arithmetic operations' stamp: 'MBM 5/6/2022 20:00:38'!
 multiplyAnEntero: anEntero
@@ -610,6 +625,11 @@ initializeWith: aNumerator over: aDenominator
 	
 	numerator := aNumerator.
 	denominator := aDenominator ! !
+
+!Fraccion methodsFor: 'initialization' stamp: 'FR 5/6/2022 21:04:43'!
+subtractToAnEntero: anEntero
+
+	^ Fraccion new initializeWith: ((anEntero * denominator) - (numerator)) over: (denominator).! !
 
 
 !Fraccion methodsFor: 'testing' stamp: 'NR 9/23/2018 23:41:38'!
