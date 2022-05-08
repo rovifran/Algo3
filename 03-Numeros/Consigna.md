@@ -55,12 +55,11 @@ hace que el colaborador (que conoce su tipo) se ocupe de realizar la accion corr
 ### Lógica de instanciado
 Con lo que vieron y saben hasta ahora, ¿donde les parece mejor tener la lógica de cómo instanciar un objeto? ¿por qué? ¿Y si se crea ese objeto desde diferentes lugares y de diferentes formas? ¿cómo lo resuelven?
 
-Respuesta: En nuestra opinión, y en base al ejercicio, creemos que la lógica de cómo instanciar un objeto debería ir en el apartado
-de clases, porque no tiene tanto sentido que instancias de un objeto puedan crear nuevas instancias de ese mismo objeto (por
-cómo está hecho la lógica de instanciar objetos, la parte de instancia solo se encarga de asignarle valores a los colaboradores
-internos del objeto).
-(la pregunta no va por este lado, va por el lado de si estaria bien, por ejemplo, que los tests tengan la responsabilidad de crear
-instancias de numeros)
+Respuesta: Nos parece que la logica sobre cómo instanciar un objeto debe ser responsabilidad de ese mismo objeto, no es lo ideal
+que dependa de un tercero. Por ejemplo en el caso de este ejercicio, no tiene sentido que los tests sean los que tengan el cómo
+se instancia un entero o una fraccion, deben saber crearse por sí solos. No se debería crear el objeto en distintos lugares y de
+formas diferentes ya que se corre el riesgo de instanciar de forma inadecuada al objeto provocando errores. Lo arreglaríamos 
+poniendo los mensajes de instanciación del objeto en la categoria private y con documentacion aclarando al programador cómo y de qué forma instanciar a dicho objeto.
 
 ### Nombres de las categorías de métodos
 Con lo que vieron y trabajaron hasta ahora, ¿qué criterio están usando para categorizar métodos?

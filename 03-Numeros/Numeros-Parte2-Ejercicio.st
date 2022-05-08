@@ -503,7 +503,7 @@ beAddedToAnFraccion: anAdder
 	^self + anAdder.
 	"Aprovechamos la conmutatividad de la suma y usamos la suma implementada en Entero"! !
 
-!Entero methodsFor: 'arithmetic operations - private' stamp: 'MBM 5/6/2022 20:03:39'!
+!Entero methodsFor: 'arithmetic operations - private' stamp: 'FR 5/7/2022 11:45:40'!
 divideAnEntero: aDividend 
 	
 	^Fraccion with: aDividend over: self.! !
@@ -565,20 +565,15 @@ Numero subclass: #Fraccion
 	poolDictionaries: ''
 	category: 'Numeros-Parte2-Ejercicio'!
 
-!Fraccion methodsFor: 'arithmetic operations' stamp: 'MBM 5/6/2022 19:59:35'!
+!Fraccion methodsFor: 'arithmetic operations' stamp: 'FR 5/8/2022 19:35:03'!
 * aMultiplier 
 	
-	^aMultiplier multiplyAnFraccion: self.
-	"(aMultiplier isKindOf: Fraccion) ifTrue: [^(numerator * aMultiplier numerator) / (denominator * aMultiplier denominator)].
-	(aMultiplier isKindOf: Entero) ifTrue: [^(numerator * aMultiplier) / denominator ]."! !
+	^aMultiplier multiplyAnFraccion: self.! !
 
-!Fraccion methodsFor: 'arithmetic operations' stamp: 'MBM 5/5/2022 20:54:32'!
-+ anAdder 
-	anAdder class = Fraccion ifTrue: [
-	^ anAdder beAddedToAnFraccion: self].
-	anAdder class = Entero ifTrue: [
-		^ anAdder beAddedToAnFraccion: self
-		]! !
+!Fraccion methodsFor: 'arithmetic operations' stamp: 'FR 5/8/2022 19:35:44'!
++ anAdder
+
+	^ anAdder beAddedToAnFraccion: self! !
 
 !Fraccion methodsFor: 'arithmetic operations' stamp: 'FR 5/7/2022 10:44:28'!
 - aSubtrahend 
