@@ -152,19 +152,10 @@ Object subclass: #OOStack
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
 
-!OOStack methodsFor: 'private' stamp: 'MBM 5/10/2022 20:05:29'!
-decreaseSizeByOne.
-	size _ self size - 1.! !
-
-!OOStack methodsFor: 'private' stamp: 'MBM 5/10/2022 20:04:39'!
-increaseSizeByOne
-	size _ self size + 1.! !
-
-!OOStack methodsFor: 'private' stamp: 'MBM 5/10/2022 19:45:59'!
+!OOStack methodsFor: 'private' stamp: 'FR 5/12/2022 10:09:46'!
 initialize
-	size := 0.
 	stack := OrderedCollection new.
-	! !
+	size := stack size.! !
 
 !OOStack methodsFor: 'private' stamp: 'MBM 5/10/2022 20:01:49'!
 stack
@@ -175,30 +166,28 @@ stack
 isEmpty
 	^self size = 0.! !
 
-!OOStack methodsFor: 'public' stamp: 'MBM 5/10/2022 20:08:50'!
+!OOStack methodsFor: 'public' stamp: 'FR 5/12/2022 10:11:35'!
 pop
 	
 	self isEmpty ifTrue: [self error: self class stackEmptyErrorDescription ].
-	self isEmpty negated ifTrue: [
+	self isEmpty not ifTrue: [
 		| element |
 		element _ self stack removeFirst.
-		self decreaseSizeByOne.
 		^element.
 	].! !
 
-!OOStack methodsFor: 'public' stamp: 'MBM 5/10/2022 20:04:13'!
+!OOStack methodsFor: 'public' stamp: 'FR 5/12/2022 10:11:16'!
 push: aString 
-	self stack addFirst: aString.
-	self increaseSizeByOne.! !
+	self stack addFirst: aString.! !
 
-!OOStack methodsFor: 'public' stamp: 'MBM 5/10/2022 19:47:12'!
+!OOStack methodsFor: 'public' stamp: 'FR 5/12/2022 10:09:37'!
 size
-	^size! !
+	^self stack size.! !
 
-!OOStack methodsFor: 'public' stamp: 'MBM 5/10/2022 20:08:00'!
+!OOStack methodsFor: 'public' stamp: 'FR 5/12/2022 10:10:39'!
 top
 	self isEmpty ifTrue: [self error: self class stackEmptyErrorDescription ].
-	self isEmpty negated  ifTrue: [	^stack at: 1 ].! !
+	self isEmpty not ifTrue: [	^stack at: 1 ].! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
