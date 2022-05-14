@@ -144,14 +144,42 @@ TestCase subclass: #SentenceFinderByPrefixTest
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
 
-!SentenceFinderByPrefixTest methodsFor: 'as yet unclassified' stamp: 'FR 5/13/2022 21:31:16'!
+!SentenceFinderByPrefixTest methodsFor: 'as yet unclassified' stamp: 'FR 5/14/2022 18:10:40'!
 test01FindingAPrefixInAnEmptyStackReturnsAnEmptyCollection
 	| aStack aSentenceFinderByPrefix aPrefix |
 	aStack _ OOStack new.
 	aSentenceFinderByPrefix _ SentenceFinderByPrefix new.
-	aPrefix _ ''
+	aPrefix _ 'hola'.
 	
-	self assert: (aSentenceFinderByPrefix find: '')! !
+	self assert: (aSentenceFinderByPrefix find: aPrefix in: aStack) isEmpty.! !
+
+!SentenceFinderByPrefixTest methodsFor: 'as yet unclassified' stamp: 'FR 5/14/2022 18:16:42'!
+test02FindingAnEmptyPrefixReturnsError
+	| aStack aSentenceFinderByPrefix aPrefix |
+	aStack _ OOStack new.
+	aSentenceFinderByPrefix _ SentenceFinderByPrefix new.
+	aStack push: '123'.
+	aPrefix _ ''.
+	
+	self
+		should: [ aSentenceFinderByPrefix find: aPrefix in: aStack ]
+		raise: Error - MessageNotUnderstood 
+		withExceptionDo: [ :anError |
+			self assert: anError messageText = SentenceFinderByPrefix invalidPrefixErrorMessage ]! !
+
+!SentenceFinderByPrefixTest methodsFor: 'as yet unclassified' stamp: 'FR 5/14/2022 18:16:27'!
+test03FindingAPrefixWithASpaceReturnsError
+	| aStack aSentenceFinderByPrefix aPrefix |
+	aStack _ OOStack new.
+	aSentenceFinderByPrefix _ SentenceFinderByPrefix new.
+	aStack push: 'hola como andas'.
+	aPrefix _ 'hola '.
+	
+	self
+		should: [ aSentenceFinderByPrefix find: aPrefix in: aStack ]
+		raise: Error - MessageNotUnderstood 
+		withExceptionDo: [ :anError |
+			self assert: anError messageText = SentenceFinderByPrefix invalidPrefixErrorMessage ]! !
 
 
 !classDefinition: #Node category: 'Stack-Exercise'!
@@ -263,7 +291,7 @@ push: aString
 size
 	^self topNode numberId.! !
 
-!OOStack methodsFor: 'public' stamp: 'FR 5/13/2022 20:33:11'!
+!OOStack methodsFor: 'public' stamp: 'FR 5/14/2022 12:14:34'!
 top
 	^ self topNode element.! !
 
@@ -286,6 +314,10 @@ Object subclass: #SentenceFinderByPrefix
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
 
+!SentenceFinderByPrefix methodsFor: 'private' stamp: 'FR 5/14/2022 18:01:47'!
+isAValidPrefix: aPrefix
+	^ aPrefix size > 0 and: (aPrefix includesSubString: ' ' ) not.! !
+
 !SentenceFinderByPrefix methodsFor: 'private' stamp: 'FR 5/13/2022 20:55:17'!
 obtainStringsFrom: aStack
 	| aCollection poppedElement|
@@ -301,11 +333,28 @@ obtainStringsFrom: aStack
 	! !
 
 
-!SentenceFinderByPrefix methodsFor: 'public' stamp: 'FR 5/13/2022 21:20:51'!
+!SentenceFinderByPrefix methodsFor: 'public' stamp: 'FR 5/14/2022 18:04:27'!
 find: aPrefixToFind in: aStack
 	"Receives a prefix and a stack of strings, and returns an OrderedCollection with the strings that match the prefix.
 	This is case-sensitive"
 	| aCollection |
+	(self isAValidPrefix: aPrefixToFind) ifTrue: [
+		aCollection _ self obtainStringsFrom: aStack.
+		aCollection removeAllSuchThat: [ :aString | (aString beginsWith: aPrefixToFind ) not ].
+		^aCollection.
+	]
+
+	ifFalse: [ self error: self class invalidPrefixErrorMessage ] ."
 	aCollection _ self obtainStringsFrom: aStack.
 	aCollection removeAllSuchThat: [ :aString | (aString beginsWith: aPrefixToFind ) not ].
-	^aCollection.! !
+	^aCollection."! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'SentenceFinderByPrefix class' category: 'Stack-Exercise'!
+SentenceFinderByPrefix class
+	instanceVariableNames: ''!
+
+!SentenceFinderByPrefix class methodsFor: 'as yet unclassified' stamp: 'FR 5/14/2022 18:05:18'!
+invalidPrefixErrorMessage
+	^ 'Prefix cannot be empty or contain blank spaces'! !
