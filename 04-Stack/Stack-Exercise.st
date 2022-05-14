@@ -144,6 +144,15 @@ TestCase subclass: #SentenceFinderByPrefixTest
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
 
+!SentenceFinderByPrefixTest methodsFor: 'as yet unclassified' stamp: 'FR 5/13/2022 21:31:16'!
+test01FindingAPrefixInAnEmptyStackReturnsAnEmptyCollection
+	| aStack aSentenceFinderByPrefix aPrefix |
+	aStack _ OOStack new.
+	aSentenceFinderByPrefix _ SentenceFinderByPrefix new.
+	aPrefix _ ''
+	
+	self assert: (aSentenceFinderByPrefix find: '')! !
+
 
 !classDefinition: #Node category: 'Stack-Exercise'!
 Object subclass: #Node
@@ -236,15 +245,8 @@ topNode
 isEmpty
 	^self topNode isKindOf: NullNode.! !
 
-!OOStack methodsFor: 'public' stamp: 'FR 5/13/2022 20:20:20'!
+!OOStack methodsFor: 'public' stamp: 'FR 5/13/2022 20:32:59'!
 pop
-"	
-	self isEmpty ifTrue: [self error: self class stackEmptyErrorDescription ].
-	self isEmpty not ifTrue: [
-		| element |
-		element _ self stack removeFirst.
-		^element.
-	]."
 	| topNodeElement |
 	topNodeElement _ self top.
 	self newTopNode: self topNode previous.
@@ -261,10 +263,8 @@ push: aString
 size
 	^self topNode numberId.! !
 
-!OOStack methodsFor: 'public' stamp: 'FR 5/13/2022 20:15:08'!
+!OOStack methodsFor: 'public' stamp: 'FR 5/13/2022 20:33:11'!
 top
-	"self isEmpty ifTrue: [self error: self class stackEmptyErrorDescription ].
-	self isEmpty not ifTrue: [	^stack at: 1 ]."
 	^ self topNode element.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
@@ -285,3 +285,27 @@ Object subclass: #SentenceFinderByPrefix
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
+
+!SentenceFinderByPrefix methodsFor: 'private' stamp: 'FR 5/13/2022 20:55:17'!
+obtainStringsFrom: aStack
+	| aCollection poppedElement|
+	aCollection _ OrderedCollection new.
+	
+	[ aStack isEmpty not ] whileTrue: [ 
+		poppedElement _ aStack pop.
+		aCollection addFirst: poppedElement.
+		 ].
+	
+	aCollection do: [ :aString | aStack push: aString].
+	^aCollection
+	! !
+
+
+!SentenceFinderByPrefix methodsFor: 'public' stamp: 'FR 5/13/2022 21:20:51'!
+find: aPrefixToFind in: aStack
+	"Receives a prefix and a stack of strings, and returns an OrderedCollection with the strings that match the prefix.
+	This is case-sensitive"
+	| aCollection |
+	aCollection _ self obtainStringsFrom: aStack.
+	aCollection removeAllSuchThat: [ :aString | (aString beginsWith: aPrefixToFind ) not ].
+	^aCollection.! !
