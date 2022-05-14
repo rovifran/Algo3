@@ -181,6 +181,20 @@ test03FindingAPrefixWithASpaceReturnsError
 		withExceptionDo: [ :anError |
 			self assert: anError messageText = SentenceFinderByPrefix invalidPrefixErrorMessage ]! !
 
+!SentenceFinderByPrefixTest methodsFor: 'as yet unclassified' stamp: 'FR 5/14/2022 18:35:26'!
+test04FindingAPrefixInAStackReturnsTheElementsMatchingThePrefix
+	
+	| aStack aSentenceFinderByPrefix aPrefix result |
+	aStack _ OOStack new.
+	aSentenceFinderByPrefix _ SentenceFinderByPrefix new.
+	aStack push: 'gato perro'.
+	aStack push: 'algoritmos3'.
+	aStack push: 'gatoperroalgoritmos3'.
+	aPrefix _ 'gato'.
+	result _ OrderedCollection newFrom: #('gato perro' 'gatoperroalgoritmos3').
+	
+	self assert: ( (aSentenceFinderByPrefix find: aPrefix in: aStack) isEqualTo: result)! !
+
 
 !classDefinition: #Node category: 'Stack-Exercise'!
 Object subclass: #Node
