@@ -139,38 +139,17 @@ test10CanNotTopWhenThereAreNoObjectsInTheStack
 
 !classDefinition: #SentenceFinderByPrefixTest category: 'Stack-Exercise'!
 TestCase subclass: #SentenceFinderByPrefixTest
-	instanceVariableNames: 'exampleStack exampleStackCopy sentenceFinder emptyString withBlankSpaceString validPrefixString expectedResultWithValidPrefix'
+	instanceVariableNames: 'exampleStack exampleStackCopy sentenceFinder emptyString withBlankSpaceString validPrefixString validPrefixStringWithDifferentCase expectedResultWithValidPrefix expectedResultWithValidPrefixWithDifferentCases'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
 
-!SentenceFinderByPrefixTest methodsFor: 'as yet unclassified' stamp: 'MBM 5/15/2022 22:15:57'!
-setUp
-	
-	sentenceFinder _ SentenceFinderByPrefix new.
-	emptyString _ ''.
-	withBlankSpaceString _ 'first second'.
-	validPrefixString _ 'prefix'.
-	
-	exampleStack _ OOStack new.
-	exampleStackCopy _ OOStack new.
-	OrderedCollection new add: exampleStack; add: exampleStackCopy; do:
-	[ :stack | stack push: 'prefix'.
-	stack push: 'prefix1'.
-	stack push: 'prefix2'.
-	stack push: 'prefix with more words'.
-	stack push: 'string not starting with prefix'.
-	].
-	
-	expectedResultWithValidPrefix _ OrderedCollection newFrom: #('prefix' 'prefix1' 'prefix2' 'prefix with more words').
-	! !
-
-!SentenceFinderByPrefixTest methodsFor: 'as yet unclassified' stamp: 'MBM 5/15/2022 21:42:41'!
+!SentenceFinderByPrefixTest methodsFor: 'testing' stamp: 'MBM 5/15/2022 21:42:41'!
 test01FindingAPrefixInAnEmptyStackReturnsAnEmptyCollection
 	
 	self assert: (sentenceFinder find: validPrefixString in: OOStack new) isEmpty.! !
 
-!SentenceFinderByPrefixTest methodsFor: 'as yet unclassified' stamp: 'MBM 5/15/2022 22:02:17'!
+!SentenceFinderByPrefixTest methodsFor: 'testing' stamp: 'MBM 5/15/2022 22:02:17'!
 test02FindingAnEmptyPrefixReturnsError
 		
 	self 
@@ -179,7 +158,7 @@ test02FindingAnEmptyPrefixReturnsError
 		withExceptionDo: [ :anError |
 			self assert: anError messageText = SentenceFinderByPrefix invalidPrefixErrorMessage ].! !
 
-!SentenceFinderByPrefixTest methodsFor: 'as yet unclassified' stamp: 'MBM 5/15/2022 22:02:12'!
+!SentenceFinderByPrefixTest methodsFor: 'testing' stamp: 'MBM 5/15/2022 22:02:12'!
 test03FindingAPrefixWithASpaceReturnsError
 	
 	self 
@@ -188,12 +167,12 @@ test03FindingAPrefixWithASpaceReturnsError
 		withExceptionDo: [ :anError |
 			self assert: anError messageText = SentenceFinderByPrefix invalidPrefixErrorMessage ].! !
 
-!SentenceFinderByPrefixTest methodsFor: 'as yet unclassified' stamp: 'MBM 5/15/2022 22:20:13'!
+!SentenceFinderByPrefixTest methodsFor: 'testing' stamp: 'MBM 5/15/2022 22:20:13'!
 test04FindingAValidPrefixInAStackReturnsTheElementsMatchingThePrefix
 	
 	self assert: (sentenceFinder find: validPrefixString in: exampleStack ) = expectedResultWithValidPrefix.! !
 
-!SentenceFinderByPrefixTest methodsFor: 'as yet unclassified' stamp: 'MBM 5/15/2022 22:01:36'!
+!SentenceFinderByPrefixTest methodsFor: 'testing' stamp: 'MBM 5/15/2022 22:01:36'!
 test05StackSizeIsEqualToResultSizeWhenEveryItemOnStackStartsWithPrefix
 	
 	| newStack |
@@ -203,13 +182,46 @@ test05StackSizeIsEqualToResultSizeWhenEveryItemOnStackStartsWithPrefix
 	self assert: (sentenceFinder find: validPrefixString in: newStack) size = newStack size.
 	! !
 
-!SentenceFinderByPrefixTest methodsFor: 'as yet unclassified' stamp: 'MBM 5/15/2022 22:20:43'!
+!SentenceFinderByPrefixTest methodsFor: 'testing' stamp: 'MBM 5/15/2022 22:20:43'!
 test06StackFinalStateEqualsToStackInitialState
 	
 	sentenceFinder find: validPrefixString in: exampleStack.
 	
 	exampleStackCopy size timesRepeat: [
 	self assert: (exampleStack pop = exampleStackCopy pop)]! !
+
+!SentenceFinderByPrefixTest methodsFor: 'testing' stamp: 'FR 5/16/2022 12:07:49'!
+test07FindingAPrefixWithDifferentCasesReturnsTheElementsThatStartWithThePrefix
+
+	self assert: (sentenceFinder find: validPrefixStringWithDifferentCase in: exampleStack ) = expectedResultWithValidPrefixWithDifferentCases .! !
+
+
+!SentenceFinderByPrefixTest methodsFor: 'setup' stamp: 'FR 5/16/2022 12:06:22'!
+setUp
+	
+	sentenceFinder _ SentenceFinderByPrefix new.
+	emptyString _ ''.
+	withBlankSpaceString _ 'first second'.
+	validPrefixString _ 'prefix'.
+	validPrefixStringWithDifferentCase _ 'PRefix'.
+	
+	exampleStack _ OOStack new.
+	exampleStackCopy _ OOStack new.
+	OrderedCollection new add: exampleStack; add: exampleStackCopy; do:
+	[ :stack | stack push: 'prefix'.
+	stack push: 'prefix1'.
+	stack push: 'prefix2'.
+	stack push: 'prefix with more words'.
+	stack push: 'string not starting with prefix'.
+	stack push: 'PRefix with different case'.
+	stack push: 'PRefix sentence'.
+	stack push: 'Prefix'.
+	stack push: 'PREFIX all uppercase'.
+	].
+	
+	expectedResultWithValidPrefix _ OrderedCollection newFrom: #('prefix' 'prefix1' 'prefix2' 'prefix with more words').
+	expectedResultWithValidPrefixWithDifferentCases _ OrderedCollection newFrom: #('PRefix with different case' 'PRefix sentence').
+	! !
 
 
 !classDefinition: #Node category: 'Stack-Exercise'!
