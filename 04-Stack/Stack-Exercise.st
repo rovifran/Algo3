@@ -139,81 +139,146 @@ test10CanNotTopWhenThereAreNoObjectsInTheStack
 
 !classDefinition: #SentenceFinderByPrefixTest category: 'Stack-Exercise'!
 TestCase subclass: #SentenceFinderByPrefixTest
+	instanceVariableNames: 'exampleStack exampleStackCopy sentenceFinder emptyString withBlankSpaceString validPrefixString expectedResultWithValidPrefix'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Stack-Exercise'!
+
+!SentenceFinderByPrefixTest methodsFor: 'as yet unclassified' stamp: 'MBM 5/15/2022 22:15:57'!
+setUp
+	
+	sentenceFinder _ SentenceFinderByPrefix new.
+	emptyString _ ''.
+	withBlankSpaceString _ 'first second'.
+	validPrefixString _ 'prefix'.
+	
+	exampleStack _ OOStack new.
+	exampleStackCopy _ OOStack new.
+	OrderedCollection new add: exampleStack; add: exampleStackCopy; do:
+	[ :stack | stack push: 'prefix'.
+	stack push: 'prefix1'.
+	stack push: 'prefix2'.
+	stack push: 'prefix with more words'.
+	stack push: 'string not starting with prefix'.
+	].
+	
+	expectedResultWithValidPrefix _ OrderedCollection newFrom: #('prefix' 'prefix1' 'prefix2' 'prefix with more words').
+	! !
+
+!SentenceFinderByPrefixTest methodsFor: 'as yet unclassified' stamp: 'MBM 5/15/2022 21:42:41'!
+test01FindingAPrefixInAnEmptyStackReturnsAnEmptyCollection
+	
+	self assert: (sentenceFinder find: validPrefixString in: OOStack new) isEmpty.! !
+
+!SentenceFinderByPrefixTest methodsFor: 'as yet unclassified' stamp: 'MBM 5/15/2022 22:02:17'!
+test02FindingAnEmptyPrefixReturnsError
+		
+	self 
+		should: [sentenceFinder find: emptyString in: exampleStack ] 
+		raise: Error - MessageNotUnderstood
+		withExceptionDo: [ :anError |
+			self assert: anError messageText = SentenceFinderByPrefix invalidPrefixErrorMessage ].! !
+
+!SentenceFinderByPrefixTest methodsFor: 'as yet unclassified' stamp: 'MBM 5/15/2022 22:02:12'!
+test03FindingAPrefixWithASpaceReturnsError
+	
+	self 
+		should: [sentenceFinder find: withBlankSpaceString in: exampleStack ] 
+		raise: Error - MessageNotUnderstood
+		withExceptionDo: [ :anError |
+			self assert: anError messageText = SentenceFinderByPrefix invalidPrefixErrorMessage ].! !
+
+!SentenceFinderByPrefixTest methodsFor: 'as yet unclassified' stamp: 'MBM 5/15/2022 22:20:13'!
+test04FindingAValidPrefixInAStackReturnsTheElementsMatchingThePrefix
+	
+	self assert: (sentenceFinder find: validPrefixString in: exampleStack ) = expectedResultWithValidPrefix.! !
+
+!SentenceFinderByPrefixTest methodsFor: 'as yet unclassified' stamp: 'MBM 5/15/2022 22:01:36'!
+test05StackSizeIsEqualToResultSizeWhenEveryItemOnStackStartsWithPrefix
+	
+	| newStack |
+	newStack _ OOStack new.
+	100 timesRepeat: [ newStack push: validPrefixString ].
+	
+	self assert: (sentenceFinder find: validPrefixString in: newStack) size = newStack size.
+	! !
+
+!SentenceFinderByPrefixTest methodsFor: 'as yet unclassified' stamp: 'MBM 5/15/2022 22:20:43'!
+test06StackFinalStateEqualsToStackInitialState
+	
+	sentenceFinder find: validPrefixString in: exampleStack.
+	
+	exampleStackCopy size timesRepeat: [
+	self assert: (exampleStack pop = exampleStackCopy pop)]! !
+
+
+!classDefinition: #Node category: 'Stack-Exercise'!
+Object subclass: #Node
+	instanceVariableNames: 'element previous index'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Stack-Exercise'!
+
+!Node methodsFor: 'accesing' stamp: 'MBM 5/15/2022 18:39:04'!
+sendMyElementTo: anObject
+	self subclassResponsibility ! !
+
+!Node methodsFor: 'accesing' stamp: 'MBM 5/15/2022 18:46:04'!
+sendMyIndexTo: anObject
+	self subclassResponsibility ! !
+
+!Node methodsFor: 'accesing' stamp: 'MBM 5/15/2022 18:38:41'!
+sendMyPreviousTo: anObject
+	self subclassResponsibility ! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'Node class' category: 'Stack-Exercise'!
+Node class
+	instanceVariableNames: ''!
+
+!Node class methodsFor: 'as yet unclassified' stamp: 'MBM 5/15/2022 18:26:43'!
+withString: aString withPrevious: aNode
+
+	self subclassResponsibility ! !
+
+
+!classDefinition: #BaseNode category: 'Stack-Exercise'!
+Node subclass: #BaseNode
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
 
-!SentenceFinderByPrefixTest methodsFor: 'as yet unclassified' stamp: 'FR 5/14/2022 18:10:40'!
-test01FindingAPrefixInAnEmptyStackReturnsAnEmptyCollection
-	| aStack aSentenceFinderByPrefix aPrefix |
-	aStack _ OOStack new.
-	aSentenceFinderByPrefix _ SentenceFinderByPrefix new.
-	aPrefix _ 'hola'.
-	
-	self assert: (aSentenceFinderByPrefix find: aPrefix in: aStack) isEmpty.! !
+!BaseNode methodsFor: 'accesing' stamp: 'MBM 5/15/2022 18:57:05'!
+sendMyElementTo: anObject
+	anObject raiseEmptyError.! !
 
-!SentenceFinderByPrefixTest methodsFor: 'as yet unclassified' stamp: 'FR 5/14/2022 18:16:42'!
-test02FindingAnEmptyPrefixReturnsError
-	| aStack aSentenceFinderByPrefix aPrefix |
-	aStack _ OOStack new.
-	aSentenceFinderByPrefix _ SentenceFinderByPrefix new.
-	aStack push: '123'.
-	aPrefix _ ''.
-	
-	self
-		should: [ aSentenceFinderByPrefix find: aPrefix in: aStack ]
-		raise: Error - MessageNotUnderstood 
-		withExceptionDo: [ :anError |
-			self assert: anError messageText = SentenceFinderByPrefix invalidPrefixErrorMessage ]! !
+!BaseNode methodsFor: 'accesing' stamp: 'MBM 5/15/2022 18:44:56'!
+sendMyIndexTo: anObject
+	^index! !
 
-!SentenceFinderByPrefixTest methodsFor: 'as yet unclassified' stamp: 'FR 5/14/2022 18:16:27'!
-test03FindingAPrefixWithASpaceReturnsError
-	| aStack aSentenceFinderByPrefix aPrefix |
-	aStack _ OOStack new.
-	aSentenceFinderByPrefix _ SentenceFinderByPrefix new.
-	aStack push: 'hola como andas'.
-	aPrefix _ 'hola '.
-	
-	self
-		should: [ aSentenceFinderByPrefix find: aPrefix in: aStack ]
-		raise: Error - MessageNotUnderstood 
-		withExceptionDo: [ :anError |
-			self assert: anError messageText = SentenceFinderByPrefix invalidPrefixErrorMessage ]! !
+!BaseNode methodsFor: 'accesing' stamp: 'MBM 5/15/2022 18:57:12'!
+sendMyPreviousTo: anObject
+	anObject raiseEmptyError.! !
 
-!SentenceFinderByPrefixTest methodsFor: 'as yet unclassified' stamp: 'FR 5/14/2022 18:35:26'!
-test04FindingAPrefixInAStackReturnsTheElementsMatchingThePrefix
-	
-	| aStack aSentenceFinderByPrefix aPrefix result |
-	aStack _ OOStack new.
-	aSentenceFinderByPrefix _ SentenceFinderByPrefix new.
-	aStack push: 'gato perro'.
-	aStack push: 'algoritmos3'.
-	aStack push: 'gatoperroalgoritmos3'.
-	aPrefix _ 'gato'.
-	result _ OrderedCollection newFrom: #('gato perro' 'gatoperroalgoritmos3').
-	
-	self assert: ( (aSentenceFinderByPrefix find: aPrefix in: aStack) isEqualTo: result)! !
 
-
-!classDefinition: #Node category: 'Stack-Exercise'!
-Object subclass: #Node
-	instanceVariableNames: 'element previous numberId'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Stack-Exercise'!
+!BaseNode methodsFor: 'initializing' stamp: 'MBM 5/15/2022 18:25:30'!
+initialize
+	element _ nil.
+	previous _ nil.
+	index _ 0.! !
 
-!Node methodsFor: 'as yet unclassified' stamp: 'FR 5/13/2022 20:27:00'!
-element
-	^element.! !
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!Node methodsFor: 'as yet unclassified' stamp: 'FR 5/13/2022 19:43:29'!
-numberId
-	^numberId.! !
+!classDefinition: 'BaseNode class' category: 'Stack-Exercise'!
+BaseNode class
+	instanceVariableNames: ''!
 
-!Node methodsFor: 'as yet unclassified' stamp: 'FR 5/13/2022 20:22:45'!
-previous
-	^previous.! !
+!BaseNode class methodsFor: 'as yet unclassified' stamp: 'MBM 5/15/2022 18:24:56'!
+withString: aString withPrevious: aNode
+
+	^BaseNode new.! !
 
 
 !classDefinition: #FilledNode category: 'Stack-Exercise'!
@@ -223,40 +288,36 @@ Node subclass: #FilledNode
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
 
-!FilledNode methodsFor: 'private' stamp: 'FR 5/13/2022 19:42:30'!
+!FilledNode methodsFor: 'accesing' stamp: 'MBM 5/15/2022 18:43:18'!
+sendMyElementTo: anObject
+	^element ! !
+
+!FilledNode methodsFor: 'accesing' stamp: 'MBM 5/15/2022 18:45:13'!
+sendMyIndexTo: anObject
+	^index! !
+
+!FilledNode methodsFor: 'accesing' stamp: 'MBM 5/15/2022 18:45:37'!
+sendMyPreviousTo: anObject
+	^previous! !
+
+
+!FilledNode methodsFor: 'initializing' stamp: 'MBM 5/15/2022 18:52:26'!
 initializeWith: aString withPrevious: previousNode
 	element _ aString.
 	previous _ previousNode.
-	numberId _ previousNode numberId + 1.
+	index _ (previousNode sendMyIndexTo: self) + 1.
 	! !
 
-
-!classDefinition: #NullNode category: 'Stack-Exercise'!
-Node subclass: #NullNode
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Stack-Exercise'!
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!NullNode methodsFor: 'private' stamp: 'FR 5/13/2022 20:26:41'!
-element
-	self error: OOStack stackEmptyErrorDescription.! !
+!classDefinition: 'FilledNode class' category: 'Stack-Exercise'!
+FilledNode class
+	instanceVariableNames: ''!
 
-!NullNode methodsFor: 'private' stamp: 'FR 5/13/2022 20:20:59'!
-initialize
-	element _ nil.
-	previous _ self.
-	numberId _ 0.! !
+!FilledNode class methodsFor: 'as yet unclassified' stamp: 'MBM 5/15/2022 18:24:19'!
+withString: aString withPrevious: aNode
 
-!NullNode methodsFor: 'private' stamp: 'FR 5/13/2022 20:22:11'!
-initializeWith: aString withPrevious: previousNode
-	element _ nil.
-	previous _ self.
-	numberId _ 0.! !
-
-!NullNode methodsFor: 'private' stamp: 'FR 5/13/2022 20:24:11'!
-previous
-	self error: OOStack stackEmptyErrorDescription.! !
+	^FilledNode new initializeWith: aString withPrevious: aNode.! !
 
 
 !classDefinition: #OOStack category: 'Stack-Exercise'!
@@ -266,48 +327,48 @@ Object subclass: #OOStack
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
 
-!OOStack methodsFor: 'private' stamp: 'FR 5/13/2022 20:07:17'!
+!OOStack methodsFor: 'private' stamp: 'MBM 5/15/2022 18:50:07'!
 initialize
-	topNode _ NullNode new.! !
+	topNode _ BaseNode new.! !
 
 !OOStack methodsFor: 'private' stamp: 'FR 5/13/2022 20:17:36'!
 newTopNode: aNewNode
 	topNode _ aNewNode.! !
 
-!OOStack methodsFor: 'private' stamp: 'MBM 5/10/2022 20:01:49'!
-stack
-	^stack! !
+!OOStack methodsFor: 'private' stamp: 'MBM 5/15/2022 18:56:56'!
+raiseEmptyError
+	self error: self class stackEmptyErrorDescription.! !
 
 !OOStack methodsFor: 'private' stamp: 'FR 5/13/2022 20:14:32'!
 topNode
 	^topNode! !
 
 
-!OOStack methodsFor: 'public' stamp: 'FR 5/13/2022 20:18:22'!
+!OOStack methodsFor: 'public' stamp: 'MBM 5/15/2022 18:01:02'!
 isEmpty
-	^self topNode isKindOf: NullNode.! !
+	^self size = 0.! !
 
-!OOStack methodsFor: 'public' stamp: 'FR 5/13/2022 20:32:59'!
+!OOStack methodsFor: 'public' stamp: 'MBM 5/15/2022 18:47:30'!
 pop
 	| topNodeElement |
 	topNodeElement _ self top.
-	self newTopNode: self topNode previous.
+	self newTopNode: (self topNode sendMyPreviousTo: self).
 	^topNodeElement.! !
 
-!OOStack methodsFor: 'public' stamp: 'FR 5/13/2022 20:17:16'!
+!OOStack methodsFor: 'public' stamp: 'MBM 5/15/2022 17:58:24'!
 push: aString
 	| newNode | 
-	newNode _ FilledNode new initializeWith: aString withPrevious: self topNode.
+	newNode _ FilledNode withString: aString withPrevious: self topNode.
 	self newTopNode: newNode.
 	 ! !
 
-!OOStack methodsFor: 'public' stamp: 'FR 5/13/2022 20:17:59'!
+!OOStack methodsFor: 'public' stamp: 'MBM 5/15/2022 18:48:06'!
 size
-	^self topNode numberId.! !
+	^self topNode sendMyIndexTo: self.! !
 
-!OOStack methodsFor: 'public' stamp: 'FR 5/14/2022 12:14:34'!
+!OOStack methodsFor: 'public' stamp: 'MBM 5/15/2022 18:48:24'!
 top
-	^ self topNode element.! !
+	^self topNode sendMyElementTo: self.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -328,40 +389,49 @@ Object subclass: #SentenceFinderByPrefix
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
 
-!SentenceFinderByPrefix methodsFor: 'private' stamp: 'FR 5/14/2022 18:01:47'!
+!SentenceFinderByPrefix methodsFor: 'private' stamp: 'MBM 5/15/2022 21:25:48'!
 isAValidPrefix: aPrefix
-	^ aPrefix size > 0 and: (aPrefix includesSubString: ' ' ) not.! !
 
-!SentenceFinderByPrefix methodsFor: 'private' stamp: 'FR 5/13/2022 20:55:17'!
+	^(aPrefix size > 0 and: (aPrefix includesSubString: ' ' ) not)! !
+
+!SentenceFinderByPrefix methodsFor: 'private' stamp: 'MBM 5/15/2022 21:33:54'!
 obtainStringsFrom: aStack
+	"Recieves a Stack and returns an OrderedCollection which includes all the elements in the Stack.
+	The final state of the Stack is the same as the initial one."
 	| aCollection poppedElement|
 	aCollection _ OrderedCollection new.
 	
-	[ aStack isEmpty not ] whileTrue: [ 
+	aStack size timesRepeat: [ 
 		poppedElement _ aStack pop.
 		aCollection addFirst: poppedElement.
-		 ].
+		].
 	
 	aCollection do: [ :aString | aStack push: aString].
 	^aCollection
-	! !
+	
+	"Solucion alternativa que utiliza whileTrue para el ciclo:
+	[ aStack isEmpty ] whileFalse: [ 
+		poppedElement _ aStack pop.
+		aCollection addFirst: poppedElement.
+	 ]."! !
 
 
-!SentenceFinderByPrefix methodsFor: 'public' stamp: 'FR 5/14/2022 18:04:27'!
-find: aPrefixToFind in: aStack
+!SentenceFinderByPrefix methodsFor: 'public' stamp: 'MBM 5/15/2022 21:32:44'!
+find: aPrefix in: aStack
 	"Receives a prefix and a stack of strings, and returns an OrderedCollection with the strings that match the prefix.
 	This is case-sensitive"
 	| aCollection |
-	(self isAValidPrefix: aPrefixToFind) ifTrue: [
+	
+	
+	(self isAValidPrefix: aPrefix ) ifTrue: [
 		aCollection _ self obtainStringsFrom: aStack.
-		aCollection removeAllSuchThat: [ :aString | (aString beginsWith: aPrefixToFind ) not ].
+		aCollection removeAllSuchThat: [ :aString | (aString beginsWith: aPrefix ) not ].
 		^aCollection.
-	]
-
-	ifFalse: [ self error: self class invalidPrefixErrorMessage ] ."
-	aCollection _ self obtainStringsFrom: aStack.
-	aCollection removeAllSuchThat: [ :aString | (aString beginsWith: aPrefixToFind ) not ].
-	^aCollection."! !
+	].
+	self error: self class invalidPrefixErrorMessage.
+	
+	"Solucion Alternativa: Consideramos implementar abstraer el 'ifTrue:' a una clase Prefix que se instancia con el string recibido, subclasificada en ValidPrefix e InvalidPrefix como clases polimorficas que modelaban el comportamiento de un prefijo valido e invalido, y de esta forma abstraer con un Switch Dinamico el 'if'. Pero llegamos a la conclusion de que, un prefijo solo puede ser valido o invalido, los objetos ValidPrefix e InvalidPrefix no tenían un motivo claro de ser (ya que simplemente son Strings encapsuladas) y por mas escalable que fuera esta solucion, nunca se añadirian mas posibles subclases de Prefix, o es valido o invalido.
+	Por estas razones consideramos que es mas elegante y prolija esta solucion, ya que realizar todo este proceso no trae ninguna ventaja significativa y requiere mayor trabajo."! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -369,6 +439,6 @@ find: aPrefixToFind in: aStack
 SentenceFinderByPrefix class
 	instanceVariableNames: ''!
 
-!SentenceFinderByPrefix class methodsFor: 'as yet unclassified' stamp: 'FR 5/14/2022 18:05:18'!
+!SentenceFinderByPrefix class methodsFor: 'as yet unclassified' stamp: 'MBM 5/15/2022 17:32:04'!
 invalidPrefixErrorMessage
 	^ 'Prefix cannot be empty or contain blank spaces'! !
