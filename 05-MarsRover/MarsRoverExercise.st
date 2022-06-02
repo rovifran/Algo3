@@ -169,6 +169,84 @@ test17CanNotSendInvalidCommandToMarsRover
 		raise: Error - MessageNotUnderstood 
 		withExceptionDo: [ :anError | self assert: MarsRover invalidCommandErrorDescription equals: anError messageText ]! !
 
+!MarsRoverTest methodsFor: 'as yet unclassified' stamp: 'MBM 6/1/2022 22:04:46'!
+test18MarsRoverFacingNorthAtOriginMovesForwardsMultipleTimesCorrectly
+	| marsRover |
+	marsRover _ MarsRover atPosition: 0@0 facingTowards: 'N'.
+	
+	2 timesRepeat: [marsRover processAStringOfCommands: 'f'].
+	self assert: 0@2 equals: marsRover position.! !
+
+!MarsRoverTest methodsFor: 'as yet unclassified' stamp: 'MBM 6/1/2022 22:02:20'!
+test19MarsRoverFacingEastAtOriginMovesForwardsMultipleTimesCorrectly
+	| marsRover |
+	marsRover _ MarsRover atPosition: 0@0 facingTowards: 'E'.
+	
+	2 timesRepeat: [marsRover processAStringOfCommands: 'f'].
+	self assert: 2@0 equals: marsRover position.
+	
+	! !
+
+!MarsRoverTest methodsFor: 'as yet unclassified' stamp: 'MBM 6/1/2022 22:02:55'!
+test20MarsRoverFacingSouthAtOriginMovesForwardsMultipleTimesCorrectly
+	| marsRover |
+	marsRover _ MarsRover atPosition: 0@0 facingTowards: 'S'.
+	
+	2 timesRepeat: [marsRover processAStringOfCommands: 'f'].
+	self assert: 0@-2 equals: marsRover position.
+	
+	! !
+
+!MarsRoverTest methodsFor: 'as yet unclassified' stamp: 'MBM 6/1/2022 22:03:39'!
+test21MarsRoverFacingWestAtOriginMovesForwardsMultipleTimesCorrectly
+	| marsRover |
+	marsRover _ MarsRover atPosition: 0@0 facingTowards: 'W'.
+	
+	2 timesRepeat: [marsRover processAStringOfCommands: 'f'].
+	self assert: -2@0 equals: marsRover position.
+	
+	! !
+
+!MarsRoverTest methodsFor: 'as yet unclassified' stamp: 'MBM 6/1/2022 22:05:24'!
+test22MarsRoverFacingNorthAtOriginMovesBackwardsMultipleTimesCorrectly
+	| marsRover |
+	marsRover _ MarsRover atPosition: 0@0 facingTowards: 'N'.
+	
+	2 timesRepeat: [marsRover processAStringOfCommands: 'b'].
+	self assert: 0@-2 equals: marsRover position.! !
+
+!MarsRoverTest methodsFor: 'as yet unclassified' stamp: 'MBM 6/1/2022 22:06:48'!
+test23MarsRoverFacingEastAtOriginMovesBackwardsMultipleTimesCorrectly
+	| marsRover |
+	marsRover _ MarsRover atPosition: 0@0 facingTowards: 'E'.
+	
+	2 timesRepeat: [marsRover processAStringOfCommands: 'b'].
+	self assert: -2@0 equals: marsRover position.! !
+
+!MarsRoverTest methodsFor: 'as yet unclassified' stamp: 'MBM 6/1/2022 22:07:09'!
+test24MarsRoverFacingSouthAtOriginMovesBackwardsMultipleTimesCorrectly
+	| marsRover |
+	marsRover _ MarsRover atPosition: 0@0 facingTowards: 'S'.
+	
+	2 timesRepeat: [marsRover processAStringOfCommands: 'b'].
+	self assert: 0@2 equals: marsRover position.! !
+
+!MarsRoverTest methodsFor: 'as yet unclassified' stamp: 'MBM 6/1/2022 22:07:26'!
+test25MarsRoverFacingWestAtOriginMovesBackwardsMultipleTimesCorrectly
+	| marsRover |
+	marsRover _ MarsRover atPosition: 0@0 facingTowards: 'W'.
+	
+	2 timesRepeat: [marsRover processAStringOfCommands: 'b'].
+	self assert: 2@0 equals: marsRover position.! !
+
+!MarsRoverTest methodsFor: 'as yet unclassified' stamp: 'MBM 6/1/2022 22:19:05'!
+test26AStringWithMoreThanOneCommandIsProcessedCorrectly
+	| marsRover |
+	marsRover _ MarsRover atPosition: 0@0 facingTowards: 'N'.
+	
+	marsRover processAStringOfCommands: 'ffrb'.
+	self assert: -1@2 equals: marsRover position.! !
+
 
 !classDefinition: #MarsRover category: 'MarsRoverExercise'!
 Object subclass: #MarsRover
@@ -191,33 +269,37 @@ orientation
 position
 	^position.! !
 
-!MarsRover methodsFor: 'public' stamp: 'MBM 6/1/2022 20:37:00'!
-processAStringOfCommands: aString 
-	aString = 'r' ifTrue: [
+!MarsRover methodsFor: 'public' stamp: 'MBM 6/1/2022 22:46:47'!
+processACommand: aChar	
+	aChar = $r ifTrue: [
 		orientation = 'N' ifTrue: [^orientation _ 'E'].
 		orientation = 'E' ifTrue: [^orientation _ 'S'].
 		orientation = 'S' ifTrue: [^orientation _ 'W'].
 		orientation = 'W' ifTrue: [^orientation _ 'N'].
 	].
-	aString = 'l' ifTrue: [
+	aChar = $l ifTrue: [
 		orientation = 'N' ifTrue: [^orientation _ 'W'].
 		orientation = 'W' ifTrue: [^orientation _ 'S'].
 		orientation = 'S' ifTrue: [^orientation _ 'E'].
 		orientation = 'E' ifTrue: [^orientation _ 'N'].
 	].
-	aString = 'f' ifTrue: [
-		orientation = 'N' ifTrue: [^position _ 0@1].
-		orientation = 'E' ifTrue: [^position _ 1@0].
-		orientation = 'S' ifTrue: [^position _ 0@-1].
-		orientation = 'W' ifTrue: [^position _ -1@0].
+	aChar = $f ifTrue: [
+		orientation = 'N' ifTrue: [^position _ position + (0@1)].
+		orientation = 'E' ifTrue: [^position _ position + (1@0)].
+		orientation = 'S' ifTrue: [^position _ position + (0@-1)].
+		orientation = 'W' ifTrue: [^position _ position + (-1@0)].
 	].
-	aString = 'b' ifTrue: [
-		orientation = 'N' ifTrue: [^position _ 0@-1].
-		orientation = 'E' ifTrue: [^position _ -1@0].
-		orientation = 'S' ifTrue: [^position _ 0@1].
-		orientation = 'W' ifTrue: [^position _ 1@0].
+	aChar = $b ifTrue: [
+		orientation = 'N' ifTrue: [^position _ position + (0@-1)].
+		orientation = 'E' ifTrue: [^position _ position + (-1@0)].
+		orientation = 'S' ifTrue: [^position _ position + (0@1)].
+		orientation = 'W' ifTrue: [^position _ position + (1@0)].
 	].
 	self error: self class invalidCommandErrorDescription.! !
+
+!MarsRover methodsFor: 'public' stamp: 'MBM 6/1/2022 22:46:28'!
+processAStringOfCommands: aStringOfCommands 
+	aStringOfCommands do: [ :aChar | self processACommand: aChar	].! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -230,6 +312,6 @@ atPosition: aPoint facingTowards: aString
 	^self new initializeAtPosition: aPoint facingTowards: aString ! !
 
 
-!MarsRover class methodsFor: 'errors' stamp: 'MBM 6/1/2022 20:38:36'!
+!MarsRover class methodsFor: 'errors' stamp: 'MBM 6/1/2022 22:57:44'!
 invalidCommandErrorDescription
-	^'The received command was invalid.'! !
+	^'An invalid command was found.'! !
