@@ -65,68 +65,68 @@ test08MarsRoverFacingEastEndsFacingNorthWhenRotatedLeft
 	! !
 
 
-!MarsRoverTest methodsFor: '09-12 moving forwards' stamp: 'FR 6/2/2022 12:09:08'!
+!MarsRoverTest methodsFor: '09-12 moving forwards' stamp: 'FR 6/2/2022 13:33:52'!
 test09MarsRoverFacingNorthAtOriginMovesForwardsCorrectly
 	
 	marsRoverAtOriginFacingNorth processAStringOfCommands: 'f'.
-	self assert: (marsRoverAtOriginFacingNorth isInPosition: (0@1)).
+	self assert: (marsRoverAtOriginFacingNorth isAtPosition: (0@1)).
 	
 	! !
 
-!MarsRoverTest methodsFor: '09-12 moving forwards' stamp: 'FR 6/2/2022 12:10:35'!
+!MarsRoverTest methodsFor: '09-12 moving forwards' stamp: 'FR 6/2/2022 13:33:52'!
 test10MarsRoverFacingEastAtOriginMovesForwardsCorrectly
 	
 	marsRoverAtOriginFacingEast processAStringOfCommands: 'f'.
-	self assert: (marsRoverAtOriginFacingEast isInPosition: (1@0)). 
+	self assert: (marsRoverAtOriginFacingEast isAtPosition: (1@0)). 
 	
 	! !
 
-!MarsRoverTest methodsFor: '09-12 moving forwards' stamp: 'FR 6/2/2022 12:11:04'!
+!MarsRoverTest methodsFor: '09-12 moving forwards' stamp: 'FR 6/2/2022 13:33:52'!
 test11MarsRoverFacingSouthAtOriginMovesForwardsCorrectly
 	
 	marsRoverAtOriginFacingSouth processAStringOfCommands: 'f'.
-	self assert: (marsRoverAtOriginFacingSouth isInPosition: (0@-1))
+	self assert: (marsRoverAtOriginFacingSouth isAtPosition: (0@-1))
 	
 	! !
 
-!MarsRoverTest methodsFor: '09-12 moving forwards' stamp: 'FR 6/2/2022 12:11:22'!
+!MarsRoverTest methodsFor: '09-12 moving forwards' stamp: 'FR 6/2/2022 13:33:52'!
 test12MarsRoverFacingWestAtOriginMovesForwardsCorrectly
 
 	marsRoverAtOriginFacingWest processAStringOfCommands: 'f'.
-	self assert: (marsRoverAtOriginFacingWest isInPosition: (-1@0))
+	self assert: (marsRoverAtOriginFacingWest isAtPosition: (-1@0))
 	
 	! !
 
 
-!MarsRoverTest methodsFor: '13-16 moving backwards' stamp: 'FR 6/2/2022 12:17:25'!
+!MarsRoverTest methodsFor: '13-16 moving backwards' stamp: 'FR 6/2/2022 13:33:52'!
 test13MarsRoverFacingNorthAtOriginMovesBackwardsCorrectly
 	
 	marsRoverAtOriginFacingNorth processAStringOfCommands: 'b'.
-	self assert: (marsRoverAtOriginFacingNorth isInPosition: (0@-1))
+	self assert: (marsRoverAtOriginFacingNorth isAtPosition: (0@-1))
 	
 	! !
 
-!MarsRoverTest methodsFor: '13-16 moving backwards' stamp: 'FR 6/2/2022 12:17:56'!
+!MarsRoverTest methodsFor: '13-16 moving backwards' stamp: 'FR 6/2/2022 13:33:52'!
 test14MarsRoverFacingEastAtOriginMovesBackwardsCorrectly
 	
 	marsRoverAtOriginFacingEast processAStringOfCommands: 'b'.
-	self assert: (marsRoverAtOriginFacingEast isInPosition: (-1@0))
+	self assert: (marsRoverAtOriginFacingEast isAtPosition: (-1@0))
 	
 	! !
 
-!MarsRoverTest methodsFor: '13-16 moving backwards' stamp: 'FR 6/2/2022 12:22:37'!
+!MarsRoverTest methodsFor: '13-16 moving backwards' stamp: 'FR 6/2/2022 13:33:52'!
 test15MarsRoverFacingSouthAtOriginMovesBackwardsCorrectly
 	
 	marsRoverAtOriginFacingSouth processAStringOfCommands: 'b'.
-	self assert: (marsRoverAtOriginFacingSouth isInPosition: (0@1))
+	self assert: (marsRoverAtOriginFacingSouth isAtPosition: (0@1))
 	
 	! !
 
-!MarsRoverTest methodsFor: '13-16 moving backwards' stamp: 'FR 6/2/2022 12:23:59'!
+!MarsRoverTest methodsFor: '13-16 moving backwards' stamp: 'FR 6/2/2022 13:33:52'!
 test16MarsRoverFacingWestAtOriginMovesBackwardsCorrectly
 	
 	marsRoverAtOriginFacingWest processAStringOfCommands: 'b'.
-	self assert: (marsRoverAtOriginFacingWest isInPosition: (1@0))
+	self assert: (marsRoverAtOriginFacingWest isAtPosition: (1@0))
 	
 	! !
 
@@ -140,67 +140,67 @@ test17CanNotSendInvalidCommandToMarsRover
 		withExceptionDo: [ :anError | self assert: MarsRoverCommand invalidCommandErrorDescription equals: anError messageText ]! !
 
 
-!MarsRoverTest methodsFor: '18-21 many moving forwards' stamp: 'FR 6/2/2022 12:29:23'!
+!MarsRoverTest methodsFor: '18-21 many moving forwards' stamp: 'FR 6/2/2022 13:33:52'!
 test18MarsRoverFacingNorthAtOriginMovesForwardsMultipleTimesCorrectly
 	
 	2 timesRepeat: [marsRoverAtOriginFacingNorth processAStringOfCommands: 'f'].
-	self assert: (marsRoverAtOriginFacingNorth isInPosition: (0@2))! !
+	self assert: (marsRoverAtOriginFacingNorth isAtPosition: (0@2))! !
 
-!MarsRoverTest methodsFor: '18-21 many moving forwards' stamp: 'FR 6/2/2022 12:29:54'!
+!MarsRoverTest methodsFor: '18-21 many moving forwards' stamp: 'FR 6/2/2022 13:33:52'!
 test19MarsRoverFacingEastAtOriginMovesForwardsMultipleTimesCorrectly
 	
 	2 timesRepeat: [marsRoverAtOriginFacingEast processAStringOfCommands: 'f'].
-	self assert: (marsRoverAtOriginFacingEast isInPosition: (2@0))
+	self assert: (marsRoverAtOriginFacingEast isAtPosition: (2@0))
 	
 	! !
 
-!MarsRoverTest methodsFor: '18-21 many moving forwards' stamp: 'FR 6/2/2022 12:30:57'!
+!MarsRoverTest methodsFor: '18-21 many moving forwards' stamp: 'FR 6/2/2022 13:33:52'!
 test20MarsRoverFacingSouthAtOriginMovesForwardsMultipleTimesCorrectly
 	
 	2 timesRepeat: [marsRoverAtOriginFacingSouth processAStringOfCommands: 'f'].
-	self assert: (marsRoverAtOriginFacingSouth isInPosition: (0@-2))
+	self assert: (marsRoverAtOriginFacingSouth isAtPosition: (0@-2))
 	
 	! !
 
-!MarsRoverTest methodsFor: '18-21 many moving forwards' stamp: 'FR 6/2/2022 12:31:33'!
+!MarsRoverTest methodsFor: '18-21 many moving forwards' stamp: 'FR 6/2/2022 13:33:52'!
 test21MarsRoverFacingWestAtOriginMovesForwardsMultipleTimesCorrectly
 	
 	2 timesRepeat: [marsRoverAtOriginFacingWest processAStringOfCommands: 'f'].
-	self assert: (marsRoverAtOriginFacingWest isInPosition: (-2@0)).
+	self assert: (marsRoverAtOriginFacingWest isAtPosition: (-2@0)).
 	
 	! !
 
 
-!MarsRoverTest methodsFor: '22-25 many moving backwards' stamp: 'FR 6/2/2022 12:32:04'!
+!MarsRoverTest methodsFor: '22-25 many moving backwards' stamp: 'FR 6/2/2022 13:33:52'!
 test22MarsRoverFacingNorthAtOriginMovesBackwardsMultipleTimesCorrectly
 	
 	2 timesRepeat: [marsRoverAtOriginFacingNorth processAStringOfCommands: 'b'].
-	self assert: (marsRoverAtOriginFacingNorth isInPosition: (0@-2))! !
+	self assert: (marsRoverAtOriginFacingNorth isAtPosition: (0@-2))! !
 
-!MarsRoverTest methodsFor: '22-25 many moving backwards' stamp: 'FR 6/2/2022 12:32:28'!
+!MarsRoverTest methodsFor: '22-25 many moving backwards' stamp: 'FR 6/2/2022 13:33:52'!
 test23MarsRoverFacingEastAtOriginMovesBackwardsMultipleTimesCorrectly
 	
 	2 timesRepeat: [marsRoverAtOriginFacingEast processAStringOfCommands: 'b'].
-	self assert: (marsRoverAtOriginFacingEast isInPosition: (-2@0))! !
+	self assert: (marsRoverAtOriginFacingEast isAtPosition: (-2@0))! !
 
-!MarsRoverTest methodsFor: '22-25 many moving backwards' stamp: 'FR 6/2/2022 12:33:30'!
+!MarsRoverTest methodsFor: '22-25 many moving backwards' stamp: 'FR 6/2/2022 13:33:52'!
 test24MarsRoverFacingSouthAtOriginMovesBackwardsMultipleTimesCorrectly
 	
 	2 timesRepeat: [marsRoverAtOriginFacingSouth processAStringOfCommands: 'b'].
-	self assert: (marsRoverAtOriginFacingSouth isInPosition: (0@2))! !
+	self assert: (marsRoverAtOriginFacingSouth isAtPosition: (0@2))! !
 
-!MarsRoverTest methodsFor: '22-25 many moving backwards' stamp: 'FR 6/2/2022 12:34:08'!
+!MarsRoverTest methodsFor: '22-25 many moving backwards' stamp: 'FR 6/2/2022 13:33:52'!
 test25MarsRoverFacingWestAtOriginMovesBackwardsMultipleTimesCorrectly
 	
 	2 timesRepeat: [marsRoverAtOriginFacingWest processAStringOfCommands: 'b'].
-	self assert: (marsRoverAtOriginFacingWest isInPosition: (2@0))! !
+	self assert: (marsRoverAtOriginFacingWest isAtPosition: (2@0))! !
 
 
-!MarsRoverTest methodsFor: '26 multiple commands in one string' stamp: 'FR 6/2/2022 12:34:47'!
+!MarsRoverTest methodsFor: '26 multiple commands in one string' stamp: 'FR 6/2/2022 13:33:52'!
 test26AStringWithMoreThanOneCommandIsProcessedCorrectly
 	
 	marsRoverAtOriginFacingNorth processAStringOfCommands: 'ffrb'.
-	self assert: (marsRoverAtOriginFacingNorth isInPosition: (-1@2))! !
+	self assert: (marsRoverAtOriginFacingNorth isAtPosition: (-1@2))! !
 
 
 !MarsRoverTest methodsFor: 'setup' stamp: 'FR 6/2/2022 11:24:19'!
@@ -235,13 +235,13 @@ moveTowards: aPoint
 	position _ position + aPoint.! !
 
 
+!MarsRover methodsFor: 'public' stamp: 'FR 6/2/2022 13:33:52'!
+isAtPosition: aPoint
+	^position = aPoint .! !
+
 !MarsRover methodsFor: 'public' stamp: 'FR 6/2/2022 12:04:33'!
 isFacing: anOrientationAsString
 	^orientation representation = anOrientationAsString.! !
-
-!MarsRover methodsFor: 'public' stamp: 'FR 6/2/2022 12:08:21'!
-isInPosition: aPoint
-	^position = aPoint .! !
 
 !MarsRover methodsFor: 'public' stamp: 'MBM 6/2/2022 00:36:07'!
 orientation
