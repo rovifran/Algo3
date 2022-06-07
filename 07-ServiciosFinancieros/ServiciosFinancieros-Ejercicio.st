@@ -1,23 +1,42 @@
-!classDefinition: #AccountTransferenceTest category: 'ServiciosFinancieros-Ejercicio'!
-TestCase subclass: #AccountTransferenceTest
+!classDefinition: #PortfolioTest category: 'ServiciosFinancieros-Ejercicio'!
+TestCase subclass: #PortfolioTest
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'ServiciosFinancieros-Ejercicio'!
 
-!AccountTransferenceTest methodsFor: 'as yet unclassified' stamp: 'MBM 6/2/2022 21:51:23'!
-test01
-	| receiver sender amount |
-	amount := 100*peso.
-	receiver := ReceptiveAccount  new.
-	sender := ReceptiveAccount new.
-	Deposit register: amount on: sender.
+!PortfolioTest methodsFor: 'as yet unclassified' stamp: 'MBM 6/6/2022 21:27:45'!
+test01PortfolioHasZeroAsBalanceWhenCreated
+	| portfolio |
 	
-	Transference 	from: sender to: receiver for: amount.
-		
-	self assert: 100 * peso equals: receiver balance.
-	self assert: 0*peso equals: sender balance.
-! !
+	portfolio _ Portfolio new.
+	
+	self assert: 0 equals: (portfolio balance).! !
+
+!PortfolioTest methodsFor: 'as yet unclassified' stamp: 'MBM 6/6/2022 21:29:14'!
+test02PortfolioWithOneAccountHasSameBalanceAsAccount
+	| cuenta1 portfolio |
+	cuenta1 _ ReceptiveAccount  new.
+	Deposit register: 100 * peso on: cuenta1.
+	
+	portfolio _ Portfolio withAccount: cuenta1.
+
+	self assert: cuenta1 balance equals: portfolio balance.! !
+
+!PortfolioTest methodsFor: 'as yet unclassified' stamp: 'MBM 6/6/2022 21:30:23'!
+test03PortfolioBalanceIsEqualToSumOfAccountsBalances
+	| cuenta1 portfolio cuenta2 cuentas |
+	cuenta1 _ ReceptiveAccount  new.
+	Deposit register: 100 * peso on: cuenta1.
+	cuenta2 _ ReceptiveAccount new.
+	Deposit register: 200 * peso on: cuenta2.
+	cuentas _ OrderedCollection new.
+	cuentas add: cuenta1.
+	cuentas add: cuenta2.
+	
+	portfolio _ Portfolio withAccounts: cuentas.
+
+	self assert: (cuenta1 balance + cuenta2 balance) equals: portfolio balance.! !
 
 
 !classDefinition: #ReceptiveAccountTest category: 'ServiciosFinancieros-Ejercicio'!
@@ -108,6 +127,28 @@ test07AccountKnowsItsTransactions
 		
 	self assert: 1 equals: account transactions size.
 	self assert: (account transactions includes: deposit).
+! !
+
+
+!classDefinition: #TransferenceTest category: 'ServiciosFinancieros-Ejercicio'!
+TestCase subclass: #TransferenceTest
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'ServiciosFinancieros-Ejercicio'!
+
+!TransferenceTest methodsFor: 'as yet unclassified' stamp: 'MBM 6/6/2022 21:27:45'!
+test01PortfolioHasZeroAsBalanceWhenCreated
+	| receiver sender amount |
+	amount := 100*peso.
+	receiver := ReceptiveAccount  new.
+	sender := ReceptiveAccount new.
+	Deposit register: amount on: sender.
+	
+	Transference 	from: sender to: receiver for: amount.
+		
+	self assert: 100 * peso equals: receiver balance.
+	self assert: 0*peso equals: sender balance.
 ! !
 
 
@@ -214,6 +255,45 @@ for: aValue
 	^ self new initializeFor: aValue ! !
 
 
+!classDefinition: #Portfolio category: 'ServiciosFinancieros-Ejercicio'!
+Object subclass: #Portfolio
+	instanceVariableNames: 'accounts'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'ServiciosFinancieros-Ejercicio'!
+
+!Portfolio methodsFor: 'initalize' stamp: 'MBM 6/6/2022 21:15:15'!
+initialize
+	accounts _ OrderedCollection new.! !
+
+!Portfolio methodsFor: 'initalize' stamp: 'MBM 6/6/2022 21:15:09'!
+with: aCollectionOfReceptiveAccounts 
+	aCollectionOfReceptiveAccounts do: [ :aReceptiveAccount | accounts add: aReceptiveAccount ].! !
+
+
+!Portfolio methodsFor: 'accesing' stamp: 'MBM 6/6/2022 21:21:16'!
+balance
+	^accounts inject: 0 into: [ :balance :anAccount | balance + anAccount balance].! !
+
+!Portfolio methodsFor: 'accesing' stamp: 'MBM 6/6/2022 21:13:44'!
+includes: aReceptiveAccount 
+	^accounts = aReceptiveAccount .! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'Portfolio class' category: 'ServiciosFinancieros-Ejercicio'!
+Portfolio class
+	instanceVariableNames: ''!
+
+!Portfolio class methodsFor: 'hola' stamp: 'MBM 6/6/2022 21:26:12'!
+withAccount: aReceptiveAccount
+	^self new with: (OrderedCollection with: aReceptiveAccount).! !
+
+!Portfolio class methodsFor: 'hola' stamp: 'MBM 6/6/2022 21:25:14'!
+withAccounts: aCollectionOfReceptiveAccounts 
+	^self new with: aCollectionOfReceptiveAccounts.! !
+
+
 !classDefinition: #ReceptiveAccount category: 'ServiciosFinancieros-Ejercicio'!
 Object subclass: #ReceptiveAccount
 	instanceVariableNames: 'transactions'
@@ -255,15 +335,3 @@ Object subclass: #Transference
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'ServiciosFinancieros-Ejercicio'!
-
-"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
-
-!classDefinition: 'Transference class' category: 'ServiciosFinancieros-Ejercicio'!
-Transference class
-	instanceVariableNames: ''!
-
-!Transference class methodsFor: 'instance creation' stamp: 'MBM 6/2/2022 21:51:54'!
-from: aReceptiveAccount to: aReceptiveAccount2 for: aSimpleMeasure 
-	"DO NOT FORGET TO RENAME COLLABORATORS AND REMOVE THIS COMMENT!!!!"
-	self shouldBeImplemented.
-	^self new initializeFrom: aReceptiveAccount to: aReceptiveAccount2 for: aSimpleMeasure ! !
