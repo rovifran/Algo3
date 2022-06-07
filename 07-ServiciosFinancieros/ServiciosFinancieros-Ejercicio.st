@@ -13,30 +13,86 @@ test01PortfolioHasZeroAsBalanceWhenCreated
 	
 	self assert: 0 equals: (portfolio balance).! !
 
-!PortfolioTest methodsFor: 'as yet unclassified' stamp: 'MBM 6/6/2022 21:29:14'!
+!PortfolioTest methodsFor: 'as yet unclassified' stamp: 'MBM 6/7/2022 15:28:14'!
 test02PortfolioWithOneAccountHasSameBalanceAsAccount
-	| cuenta1 portfolio |
-	cuenta1 _ ReceptiveAccount  new.
-	Deposit register: 100 * peso on: cuenta1.
+	| account portfolio |
+	account _ ReceptiveAccount  new.
+	Deposit register: 100 * peso on: account.
 	
-	portfolio _ Portfolio withAccount: cuenta1.
+	portfolio _ Portfolio withAccount: account.
 
-	self assert: cuenta1 balance equals: portfolio balance.! !
+	self assert: account balance equals: portfolio balance.! !
 
-!PortfolioTest methodsFor: 'as yet unclassified' stamp: 'MBM 6/6/2022 21:30:23'!
+!PortfolioTest methodsFor: 'as yet unclassified' stamp: 'MBM 6/7/2022 15:27:54'!
 test03PortfolioBalanceIsEqualToSumOfAccountsBalances
-	| cuenta1 portfolio cuenta2 cuentas |
-	cuenta1 _ ReceptiveAccount  new.
-	Deposit register: 100 * peso on: cuenta1.
-	cuenta2 _ ReceptiveAccount new.
-	Deposit register: 200 * peso on: cuenta2.
-	cuentas _ OrderedCollection new.
-	cuentas add: cuenta1.
-	cuentas add: cuenta2.
+	| account1 portfolio account2 accounts |
+	account1 _ ReceptiveAccount  new.
+	Deposit register: 100 * peso on: account1.
+	account2 _ ReceptiveAccount new.
+	Deposit register: 200 * peso on: account2.
+	accounts _ OrderedCollection new.
+	accounts add: account1.
+	accounts add: account2.
 	
-	portfolio _ Portfolio withAccounts: cuentas.
+	portfolio _ Portfolio withAccounts: accounts.
 
-	self assert: (cuenta1 balance + cuenta2 balance) equals: portfolio balance.! !
+	self assert: (account1 balance + account2 balance) equals: portfolio balance.! !
+
+!PortfolioTest methodsFor: 'as yet unclassified' stamp: 'MBM 6/7/2022 15:56:07'!
+test04PortfolioKnowsATransactionRegisteredByAnAccountInIt
+
+	| account deposit portfolio withdraw |
+	
+	account _ ReceptiveAccount new.
+	deposit _ Deposit register: 100 * peso on: account.
+	withdraw _ Withdraw register: 50 * peso on: account.
+	portfolio _ Portfolio withAccount: account.
+		
+	self assert: (portfolio hasRegistered: deposit).
+	self assert: (portfolio hasRegistered: withdraw).
+! !
+
+!PortfolioTest methodsFor: 'as yet unclassified' stamp: 'MBM 6/7/2022 16:24:35'!
+test05PortfolioDoesNotKnowADepositNotRegisteredByAnyAccountInIt
+
+	| account deposit portfolio withdraw |
+	
+	account _ ReceptiveAccount new.
+	deposit _  Deposit for: 100 * peso.
+	withdraw _ Withdraw for: 50 * peso.
+	portfolio _ Portfolio withAccount: account.
+	
+	self deny: (portfolio hasRegistered: deposit).
+	self deny: (portfolio hasRegistered: withdraw).! !
+
+!PortfolioTest methodsFor: 'as yet unclassified' stamp: 'MBM 6/7/2022 16:28:57'!
+test06PortfolioKnowsTransactionsOfAnAccountInIt
+
+	| account portfolio withdraw deposit transactions |
+	
+	account _ ReceptiveAccount new.
+	deposit _  Deposit register: 100 * peso on: account.
+	withdraw _ Withdraw register: 50 * peso on: account.
+	portfolio _ Portfolio withAccount: account.
+	
+	transactions _ portfolio transactionsFrom: account.
+	self assert: 2 equals: transactions size.
+	self assert: (transactions includes: deposit).
+	self assert: (transactions includes: withdraw).! !
+
+!PortfolioTest methodsFor: 'as yet unclassified' stamp: 'MBM 6/7/2022 16:39:40'!
+test07PortfolioDoesNotKnowTransactionsOfAnAccountNotInIt
+
+	| account portfolio |
+	
+	account _ ReceptiveAccount new.
+	Deposit register: 100 * peso on: account.
+	Withdraw register: 50 * peso on: account.
+	portfolio _ Portfolio new.
+	
+	self should: [portfolio transactionsFrom: account]
+		raise: Error - MessageNotUnderstood 
+		withExceptionDo: [ :anError | anError messageText = Portfolio accountNotFoundErrorDescription].! !
 
 
 !classDefinition: #ReceptiveAccountTest category: 'ServiciosFinancieros-Ejercicio'!
@@ -275,9 +331,13 @@ with: aCollectionOfReceptiveAccounts
 balance
 	^accounts inject: 0 into: [ :balance :anAccount | balance + anAccount balance].! !
 
-!Portfolio methodsFor: 'accesing' stamp: 'MBM 6/6/2022 21:13:44'!
-includes: aReceptiveAccount 
-	^accounts = aReceptiveAccount .! !
+!Portfolio methodsFor: 'accesing' stamp: 'MBM 6/7/2022 16:03:23'!
+hasRegistered: aTransaction 
+	^accounts anySatisfy: [ :anAccount | anAccount hasRegistered: aTransaction ].! !
+
+!Portfolio methodsFor: 'accesing' stamp: 'MBM 6/7/2022 16:42:14'!
+transactionsFrom: aReceptiveAccount 
+	^accounts detect: [ :anAccount | anAccount = aReceptiveAccount ] ifFound: [ :anAccount | anAccount transactions] ifNone: [self error: self class accountNotFoundErrorDescription ].! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -292,6 +352,11 @@ withAccount: aReceptiveAccount
 !Portfolio class methodsFor: 'hola' stamp: 'MBM 6/6/2022 21:25:14'!
 withAccounts: aCollectionOfReceptiveAccounts 
 	^self new with: aCollectionOfReceptiveAccounts.! !
+
+
+!Portfolio class methodsFor: 'as yet unclassified' stamp: 'MBM 6/7/2022 16:40:40'!
+accountNotFoundErrorDescription
+	'Account Not Found In Portfolio.'! !
 
 
 !classDefinition: #ReceptiveAccount category: 'ServiciosFinancieros-Ejercicio'!
