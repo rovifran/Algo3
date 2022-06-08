@@ -1,44 +1,44 @@
-!classDefinition: #PortfolioTest category: 'ServiciosFinancieros-Ejercicio'!
-TestCase subclass: #PortfolioTest
+!classDefinition: #PortfolioAccountTest category: 'ServiciosFinancieros-Ejercicio'!
+TestCase subclass: #PortfolioAccountTest
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'ServiciosFinancieros-Ejercicio'!
 
-!PortfolioTest methodsFor: 'as yet unclassified' stamp: 'MBM 6/6/2022 21:27:45'!
+!PortfolioAccountTest methodsFor: 'as yet unclassified' stamp: 'FR 6/7/2022 23:26:57'!
 test01PortfolioHasZeroAsBalanceWhenCreated
 	| portfolio |
 	
-	portfolio _ Portfolio new.
+	portfolio _ PortfolioAccount new.
 	
 	self assert: 0 equals: (portfolio balance).! !
 
-!PortfolioTest methodsFor: 'as yet unclassified' stamp: 'MBM 6/7/2022 15:28:14'!
+!PortfolioAccountTest methodsFor: 'as yet unclassified' stamp: 'FR 6/7/2022 23:26:57'!
 test02PortfolioWithOneAccountHasSameBalanceAsAccount
 	| account portfolio |
 	account _ ReceptiveAccount  new.
 	Deposit register: 100 * peso on: account.
 	
-	portfolio _ Portfolio withAccount: account.
+	portfolio _ PortfolioAccount new.
+	portfolio register: account.
 
 	self assert: account balance equals: portfolio balance.! !
 
-!PortfolioTest methodsFor: 'as yet unclassified' stamp: 'MBM 6/7/2022 15:27:54'!
+!PortfolioAccountTest methodsFor: 'as yet unclassified' stamp: 'FR 6/7/2022 23:26:57'!
 test03PortfolioBalanceIsEqualToSumOfAccountsBalances
-	| account1 portfolio account2 accounts |
+	| account1 portfolio account2 |
 	account1 _ ReceptiveAccount  new.
 	Deposit register: 100 * peso on: account1.
 	account2 _ ReceptiveAccount new.
 	Deposit register: 200 * peso on: account2.
-	accounts _ OrderedCollection new.
-	accounts add: account1.
-	accounts add: account2.
 	
-	portfolio _ Portfolio withAccounts: accounts.
+	portfolio _ PortfolioAccount new.
+	portfolio register: account1.
+	portfolio register: account2.
 
 	self assert: (account1 balance + account2 balance) equals: portfolio balance.! !
 
-!PortfolioTest methodsFor: 'as yet unclassified' stamp: 'MBM 6/7/2022 15:56:07'!
+!PortfolioAccountTest methodsFor: 'as yet unclassified' stamp: 'FR 6/7/2022 23:26:57'!
 test04PortfolioKnowsATransactionRegisteredByAnAccountInIt
 
 	| account deposit portfolio withdraw |
@@ -46,13 +46,14 @@ test04PortfolioKnowsATransactionRegisteredByAnAccountInIt
 	account _ ReceptiveAccount new.
 	deposit _ Deposit register: 100 * peso on: account.
 	withdraw _ Withdraw register: 50 * peso on: account.
-	portfolio _ Portfolio withAccount: account.
+	portfolio _ PortfolioAccount new.
+	portfolio register: account.
 		
 	self assert: (portfolio hasRegistered: deposit).
 	self assert: (portfolio hasRegistered: withdraw).
 ! !
 
-!PortfolioTest methodsFor: 'as yet unclassified' stamp: 'MBM 6/7/2022 16:24:35'!
+!PortfolioAccountTest methodsFor: 'as yet unclassified' stamp: 'FR 6/7/2022 23:26:57'!
 test05PortfolioDoesNotKnowADepositNotRegisteredByAnyAccountInIt
 
 	| account deposit portfolio withdraw |
@@ -60,12 +61,13 @@ test05PortfolioDoesNotKnowADepositNotRegisteredByAnyAccountInIt
 	account _ ReceptiveAccount new.
 	deposit _  Deposit for: 100 * peso.
 	withdraw _ Withdraw for: 50 * peso.
-	portfolio _ Portfolio withAccount: account.
+	portfolio _ PortfolioAccount new.
+	portfolio register: account.
 	
 	self deny: (portfolio hasRegistered: deposit).
 	self deny: (portfolio hasRegistered: withdraw).! !
 
-!PortfolioTest methodsFor: 'as yet unclassified' stamp: 'MBM 6/7/2022 16:28:57'!
+!PortfolioAccountTest methodsFor: 'as yet unclassified' stamp: 'FR 6/7/2022 23:26:57'!
 test06PortfolioKnowsTransactionsOfAnAccountInIt
 
 	| account portfolio withdraw deposit transactions |
@@ -73,14 +75,15 @@ test06PortfolioKnowsTransactionsOfAnAccountInIt
 	account _ ReceptiveAccount new.
 	deposit _  Deposit register: 100 * peso on: account.
 	withdraw _ Withdraw register: 50 * peso on: account.
-	portfolio _ Portfolio withAccount: account.
+	portfolio _ PortfolioAccount new.
+	portfolio register: account.
 	
-	transactions _ portfolio transactionsFrom: account.
+	transactions _ portfolio transactions.
 	self assert: 2 equals: transactions size.
 	self assert: (transactions includes: deposit).
 	self assert: (transactions includes: withdraw).! !
 
-!PortfolioTest methodsFor: 'as yet unclassified' stamp: 'MBM 6/7/2022 16:39:40'!
+!PortfolioAccountTest methodsFor: 'as yet unclassified' stamp: 'FR 6/7/2022 23:26:57'!
 test07PortfolioDoesNotKnowTransactionsOfAnAccountNotInIt
 
 	| account portfolio |
@@ -88,41 +91,20 @@ test07PortfolioDoesNotKnowTransactionsOfAnAccountNotInIt
 	account _ ReceptiveAccount new.
 	Deposit register: 100 * peso on: account.
 	Withdraw register: 50 * peso on: account.
-	portfolio _ Portfolio new.
+	portfolio _ PortfolioAccount new.
 	
-	self should: [portfolio transactionsFrom: account]
-		raise: Error - MessageNotUnderstood 
-		withExceptionDo: [ :anError | anError messageText = Portfolio accountNotFoundErrorDescription].! !
+	self assert: 0 equals: portfolio transactions size.! !
 
-!PortfolioTest methodsFor: 'as yet unclassified' stamp: 'FR 6/7/2022 19:55:26'!
+!PortfolioAccountTest methodsFor: 'as yet unclassified' stamp: 'FR 6/7/2022 23:26:57'!
 test08PortfolioCanAddAccountsAfterCreation
 	| portfolio account |
 	account _ ReceptiveAccount new.
-	portfolio _ Portfolio new.
+	portfolio _ PortfolioAccount new.
 	Deposit register: 100 * peso on: account.
 	
-	portfolio add: account .
+	portfolio register: account .
 	
 	self assert: (100 * peso) equals: portfolio balance.! !
-
-!PortfolioTest methodsFor: 'as yet unclassified' stamp: 'FR 6/7/2022 20:01:25'!
-test09
-	| portfolio1 portfolio2 portfolio3 account1 account2 deposit withdraw |
-	account1 _ ReceptiveAccount new.
-	account2 _ ReceptiveAccount new.
-	deposit _ Deposit register: 100 * peso on: account1.
-	withdraw _ Withdraw 	register: 50 * peso on: account1.
-	
-	portfolio1 _ Portfolio withAccount: account1.
-	portfolio2 _ Portfolio withAccount: account2.
-	portfolio2 add: portfolio1.
-	portfolio3 _ Portfolio new.
-	portfolio3 add: portfolio2.
-	
-	self assert: (50 * peso) equals: portfolio3 balance.
-	self assert: (portfolio3 hasRegistered: deposit).
-	self assert: (portfolio3 hasRegistered: withdraw).
-	self assert: (portfolio3 transactionsFrom: account1) includes: deposit.! !
 
 
 !classDefinition: #ReceptiveAccountTest category: 'ServiciosFinancieros-Ejercicio'!
@@ -238,6 +220,83 @@ test01PortfolioHasZeroAsBalanceWhenCreated
 ! !
 
 
+!classDefinition: #Account category: 'ServiciosFinancieros-Ejercicio'!
+Object subclass: #Account
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'ServiciosFinancieros-Ejercicio'!
+
+
+!classDefinition: #PortfolioAccount category: 'ServiciosFinancieros-Ejercicio'!
+Account subclass: #PortfolioAccount
+	instanceVariableNames: 'accounts'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'ServiciosFinancieros-Ejercicio'!
+
+!PortfolioAccount methodsFor: 'initalization' stamp: 'MBM 6/6/2022 21:15:15'!
+initialize
+	accounts _ OrderedCollection new.! !
+
+!PortfolioAccount methodsFor: 'initalization' stamp: 'FR 6/7/2022 23:17:11'!
+with: aCollectionOfAccounts 
+	aCollectionOfAccounts do: [ :anAccount | accounts register: anAccount ].! !
+
+
+!PortfolioAccount methodsFor: 'main protocol' stamp: 'MBM 6/6/2022 21:21:16'!
+balance
+	^accounts inject: 0 into: [ :balance :anAccount | balance + anAccount balance].! !
+
+!PortfolioAccount methodsFor: 'main protocol' stamp: 'MBM 6/7/2022 16:03:23'!
+hasRegistered: aTransaction 
+	^accounts anySatisfy: [ :anAccount | anAccount hasRegistered: aTransaction ].! !
+
+!PortfolioAccount methodsFor: 'main protocol' stamp: 'FR 6/7/2022 23:21:22'!
+register: anAccount 
+	accounts add: anAccount.! !
+
+!PortfolioAccount methodsFor: 'main protocol' stamp: 'FR 6/7/2022 23:09:24'!
+transactions
+	^accounts inject: OrderedCollection new into: [ :aCollection :anAccount | aCollection addAll: anAccount transactions].
+	
+	! !
+
+
+!classDefinition: #ReceptiveAccount category: 'ServiciosFinancieros-Ejercicio'!
+Account subclass: #ReceptiveAccount
+	instanceVariableNames: 'transactions'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'ServiciosFinancieros-Ejercicio'!
+
+!ReceptiveAccount methodsFor: 'initialization' stamp: 'FR 6/7/2022 23:17:46'!
+initialize
+	transactions _ OrderedCollection new.! !
+
+
+!ReceptiveAccount methodsFor: 'main protocol' stamp: 'MBM 6/2/2022 21:35:48'!
+balance
+	^transactions inject: 0 into: [ :balance :aTransaction | aTransaction affectBalance: balance ].! !
+
+!ReceptiveAccount methodsFor: 'main protocol' stamp: 'NR 10/17/2019 03:28:43'!
+hasRegistered: aTransaction
+
+	^ transactions includes: aTransaction 
+! !
+
+!ReceptiveAccount methodsFor: 'main protocol' stamp: 'FR 6/7/2022 23:22:16'!
+register: aTransaction
+
+	transactions add: aTransaction 
+! !
+
+!ReceptiveAccount methodsFor: 'main protocol' stamp: 'HernanWilkinson 7/13/2011 18:37'!
+transactions 
+
+	^ transactions copy! !
+
+
 !classDefinition: #AccountTransaction category: 'ServiciosFinancieros-Ejercicio'!
 Object subclass: #AccountTransaction
 	instanceVariableNames: ''
@@ -339,110 +398,6 @@ Withdraw class
 for: aValue
 
 	^ self new initializeFor: aValue ! !
-
-
-!classDefinition: #Portfolio category: 'ServiciosFinancieros-Ejercicio'!
-Object subclass: #Portfolio
-	instanceVariableNames: 'accounts'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'ServiciosFinancieros-Ejercicio'!
-
-!Portfolio methodsFor: 'initalize' stamp: 'MBM 6/6/2022 21:15:15'!
-initialize
-	accounts _ OrderedCollection new.! !
-
-!Portfolio methodsFor: 'initalize' stamp: 'MBM 6/6/2022 21:15:09'!
-with: aCollectionOfReceptiveAccounts 
-	aCollectionOfReceptiveAccounts do: [ :aReceptiveAccount | accounts add: aReceptiveAccount ].! !
-
-
-!Portfolio methodsFor: 'accesing' stamp: 'MBM 6/6/2022 21:21:16'!
-balance
-	^accounts inject: 0 into: [ :balance :anAccount | balance + anAccount balance].! !
-
-!Portfolio methodsFor: 'accesing' stamp: 'MBM 6/7/2022 16:03:23'!
-hasRegistered: aTransaction 
-	^accounts anySatisfy: [ :anAccount | anAccount hasRegistered: aTransaction ].! !
-
-!Portfolio methodsFor: 'accesing' stamp: 'FR 6/7/2022 20:18:57'!
-transactionsFrom: aReceptiveAccount 
-	^accounts
-		detect: [ :anAccount | anAccount mmm: aReceptiveAccount ]
-		ifFound: [ :anAccount | anAccount transactions]
-		ifNone: [self error: self class accountNotFoundErrorDescription ].! !
-
-
-!Portfolio methodsFor: 'uncategorized' stamp: 'FR 6/7/2022 20:28:44'!
-mmm: aReceptiveAccount
-	accounts detect: [ :anAccount | anAccount mmm: aReceptiveAccount ]
-	ifFound: [ :anAccount | ^anAccount ] ifNone: [^false].! !
-
-
-!Portfolio methodsFor: 'adding' stamp: 'FR 6/7/2022 19:54:15'!
-add: aReceptiveAccount 
-	accounts add: aReceptiveAccount.! !
-
-!Portfolio methodsFor: 'adding' stamp: 'FR 6/7/2022 20:40:08'!
-m1: anAccountOrAnPortfolio! !
-
-"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
-
-!classDefinition: 'Portfolio class' category: 'ServiciosFinancieros-Ejercicio'!
-Portfolio class
-	instanceVariableNames: ''!
-
-!Portfolio class methodsFor: 'hola' stamp: 'MBM 6/6/2022 21:26:12'!
-withAccount: aReceptiveAccount
-	^self new with: (OrderedCollection with: aReceptiveAccount).! !
-
-!Portfolio class methodsFor: 'hola' stamp: 'MBM 6/6/2022 21:25:14'!
-withAccounts: aCollectionOfReceptiveAccounts 
-	^self new with: aCollectionOfReceptiveAccounts.! !
-
-
-!Portfolio class methodsFor: 'as yet unclassified' stamp: 'FR 6/7/2022 20:16:03'!
-accountNotFoundErrorDescription
-	^'Account Not Found In Portfolio.'! !
-
-
-!classDefinition: #ReceptiveAccount category: 'ServiciosFinancieros-Ejercicio'!
-Object subclass: #ReceptiveAccount
-	instanceVariableNames: 'transactions'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'ServiciosFinancieros-Ejercicio'!
-
-!ReceptiveAccount methodsFor: 'initialization' stamp: 'NR 10/17/2019 15:06:56'!
-initialize
-
-	transactions := OrderedCollection new.! !
-
-
-!ReceptiveAccount methodsFor: 'main protocol' stamp: 'MBM 6/2/2022 21:35:48'!
-balance
-	^transactions inject: 0 into: [ :balance :aTransaction | aTransaction affectBalance: balance ].! !
-
-!ReceptiveAccount methodsFor: 'main protocol' stamp: 'NR 10/17/2019 03:28:43'!
-hasRegistered: aTransaction
-
-	^ transactions includes: aTransaction 
-! !
-
-!ReceptiveAccount methodsFor: 'main protocol' stamp: 'FR 6/7/2022 20:22:22'!
-mmm: anAccount
-	^self = anAccount.! !
-
-!ReceptiveAccount methodsFor: 'main protocol' stamp: 'HernanWilkinson 7/13/2011 18:37'!
-register: aTransaction
-
-	transactions add: aTransaction 
-! !
-
-!ReceptiveAccount methodsFor: 'main protocol' stamp: 'HernanWilkinson 7/13/2011 18:37'!
-transactions 
-
-	^ transactions copy! !
 
 
 !classDefinition: #Transference category: 'ServiciosFinancieros-Ejercicio'!
