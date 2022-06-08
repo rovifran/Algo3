@@ -94,6 +94,36 @@ test07PortfolioDoesNotKnowTransactionsOfAnAccountNotInIt
 		raise: Error - MessageNotUnderstood 
 		withExceptionDo: [ :anError | anError messageText = Portfolio accountNotFoundErrorDescription].! !
 
+!PortfolioTest methodsFor: 'as yet unclassified' stamp: 'FR 6/7/2022 19:55:26'!
+test08PortfolioCanAddAccountsAfterCreation
+	| portfolio account |
+	account _ ReceptiveAccount new.
+	portfolio _ Portfolio new.
+	Deposit register: 100 * peso on: account.
+	
+	portfolio add: account .
+	
+	self assert: (100 * peso) equals: portfolio balance.! !
+
+!PortfolioTest methodsFor: 'as yet unclassified' stamp: 'FR 6/7/2022 20:01:25'!
+test09
+	| portfolio1 portfolio2 portfolio3 account1 account2 deposit withdraw |
+	account1 _ ReceptiveAccount new.
+	account2 _ ReceptiveAccount new.
+	deposit _ Deposit register: 100 * peso on: account1.
+	withdraw _ Withdraw 	register: 50 * peso on: account1.
+	
+	portfolio1 _ Portfolio withAccount: account1.
+	portfolio2 _ Portfolio withAccount: account2.
+	portfolio2 add: portfolio1.
+	portfolio3 _ Portfolio new.
+	portfolio3 add: portfolio2.
+	
+	self assert: (50 * peso) equals: portfolio3 balance.
+	self assert: (portfolio3 hasRegistered: deposit).
+	self assert: (portfolio3 hasRegistered: withdraw).
+	self assert: (portfolio3 transactionsFrom: account1) includes: deposit.! !
+
 
 !classDefinition: #ReceptiveAccountTest category: 'ServiciosFinancieros-Ejercicio'!
 TestCase subclass: #ReceptiveAccountTest
@@ -335,9 +365,26 @@ balance
 hasRegistered: aTransaction 
 	^accounts anySatisfy: [ :anAccount | anAccount hasRegistered: aTransaction ].! !
 
-!Portfolio methodsFor: 'accesing' stamp: 'MBM 6/7/2022 16:42:14'!
+!Portfolio methodsFor: 'accesing' stamp: 'FR 6/7/2022 20:18:57'!
 transactionsFrom: aReceptiveAccount 
-	^accounts detect: [ :anAccount | anAccount = aReceptiveAccount ] ifFound: [ :anAccount | anAccount transactions] ifNone: [self error: self class accountNotFoundErrorDescription ].! !
+	^accounts
+		detect: [ :anAccount | anAccount mmm: aReceptiveAccount ]
+		ifFound: [ :anAccount | anAccount transactions]
+		ifNone: [self error: self class accountNotFoundErrorDescription ].! !
+
+
+!Portfolio methodsFor: 'uncategorized' stamp: 'FR 6/7/2022 20:28:44'!
+mmm: aReceptiveAccount
+	accounts detect: [ :anAccount | anAccount mmm: aReceptiveAccount ]
+	ifFound: [ :anAccount | ^anAccount ] ifNone: [^false].! !
+
+
+!Portfolio methodsFor: 'adding' stamp: 'FR 6/7/2022 19:54:15'!
+add: aReceptiveAccount 
+	accounts add: aReceptiveAccount.! !
+
+!Portfolio methodsFor: 'adding' stamp: 'FR 6/7/2022 20:40:08'!
+m1: anAccountOrAnPortfolio! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -354,9 +401,9 @@ withAccounts: aCollectionOfReceptiveAccounts
 	^self new with: aCollectionOfReceptiveAccounts.! !
 
 
-!Portfolio class methodsFor: 'as yet unclassified' stamp: 'MBM 6/7/2022 16:40:40'!
+!Portfolio class methodsFor: 'as yet unclassified' stamp: 'FR 6/7/2022 20:16:03'!
 accountNotFoundErrorDescription
-	'Account Not Found In Portfolio.'! !
+	^'Account Not Found In Portfolio.'! !
 
 
 !classDefinition: #ReceptiveAccount category: 'ServiciosFinancieros-Ejercicio'!
@@ -381,6 +428,10 @@ hasRegistered: aTransaction
 
 	^ transactions includes: aTransaction 
 ! !
+
+!ReceptiveAccount methodsFor: 'main protocol' stamp: 'FR 6/7/2022 20:22:22'!
+mmm: anAccount
+	^self = anAccount.! !
 
 !ReceptiveAccount methodsFor: 'main protocol' stamp: 'HernanWilkinson 7/13/2011 18:37'!
 register: aTransaction
