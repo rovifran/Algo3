@@ -132,8 +132,8 @@ test10CanNotAddAnAccountOnAPortfolioWithAnotherPortfolioThatHasTheAccount
 		raise: Error - MessageNotUnderstood 
 		withExceptionDo: [ :anError | anError messageText = PortfolioAccount invalidAccountToAddErrorMessage ].! !
 
-!PortfolioAccountTest methodsFor: 'as yet unclassified' stamp: 'FR 6/9/2022 15:26:53'!
-test11CanNotAddAPortfolioInTheSamePortfolio
+!PortfolioAccountTest methodsFor: 'as yet unclassified' stamp: 'FR 6/9/2022 16:15:49'!
+test11CanNotAddAPortfolioInItself
 	| portfolio |
 	portfolio _ PortfolioAccount new.
 	
@@ -141,6 +141,22 @@ test11CanNotAddAPortfolioInTheSamePortfolio
 		should: [portfolio add: portfolio]
 		raise: Error - MessageNotUnderstood 
 		withExceptionDo: [ :anError | anError messageText = PortfolioAccount invalidAccountToAddErrorMessage ]! !
+
+!PortfolioAccountTest methodsFor: 'as yet unclassified' stamp: 'FR 6/9/2022 16:15:26'!
+test12PortfolioCanNotAddAnotherPortfolioWithAnAccountThatIsAlreadyInIt
+	| account portfolio1 portfolio2 |
+	portfolio1 _ PortfolioAccount new.
+	portfolio2 _ PortfolioAccount new.
+	account _ ReceptiveAccount new.
+	
+	portfolio1 add: account.
+	portfolio2 add: account .
+	
+	self
+		should: [portfolio1 add: portfolio2]
+		raise: Error - MessageNotUnderstood 
+		withExceptionDo: [ :anError | anError messageText = PortfolioAccount invalidAccountToAddErrorMessage ]
+	! !
 
 
 !classDefinition: #ReceptiveAccountTest category: 'ServiciosFinancieros-Ejercicio'!
@@ -309,13 +325,18 @@ balance
 hasRegistered: aTransaction
 	self subclassResponsibility.! !
 
-!Account methodsFor: 'main protocol' stamp: 'FR 6/9/2022 12:51:29'!
-is: anAccountToAdd
-	self subclassResponsibility.! !
-
 !Account methodsFor: 'main protocol' stamp: 'MBM 6/8/2022 22:48:43'!
 transactions
 	self subclassResponsibility.! !
+
+
+!Account methodsFor: 'private' stamp: 'FR 6/9/2022 16:04:11'!
+contains: anAccountToAdd
+	self subclassResponsibility.! !
+
+!Account methodsFor: 'private' stamp: 'FR 6/9/2022 16:03:46'!
+containsAny: aCollectionOfAccounts
+	^aCollectionOfAccounts anySatisfy: [ :anAccount | self contains: anAccount ]! !
 
 
 !classDefinition: #PortfolioAccount category: 'ServiciosFinancieros-Ejercicio'!
@@ -330,17 +351,16 @@ initialize
 	accounts _ OrderedCollection new.! !
 
 
-!PortfolioAccount methodsFor: 'private' stamp: 'FR 6/9/2022 12:52:27'!
-is: anAccountToAdd
-	self = anAccountToAdd ifTrue: [^true].
-	accounts detect: [ :anAccount | anAccount is: anAccountToAdd ] ifFound: [^true] ifNone: [^false].
+!PortfolioAccount methodsFor: 'private' stamp: 'FR 6/9/2022 16:03:46'!
+contains: anAccountToAdd
+	^ self = anAccountToAdd or: [	accounts anySatisfy: [ :anAccount | anAccount contains: anAccountToAdd ]]
 	! !
 
 
-!PortfolioAccount methodsFor: 'main protocol' stamp: 'FR 6/9/2022 15:25:12'!
+!PortfolioAccount methodsFor: 'main protocol' stamp: 'FR 6/9/2022 16:06:44'!
 add: anAccountToAdd 
 	
-	(self is: anAccountToAdd) ifTrue: [self error: self class invalidAccountToAddErrorMessage].
+	((self contains: anAccountToAdd) or: [anAccountToAdd containsAny: accounts]) ifTrue: [self error: self class invalidAccountToAddErrorMessage].
 	accounts add: anAccountToAdd.! !
 
 !PortfolioAccount methodsFor: 'main protocol' stamp: 'MBM 6/6/2022 21:21:16'!
@@ -390,10 +410,6 @@ hasRegistered: aTransaction
 	^ transactions includes: aTransaction 
 ! !
 
-!ReceptiveAccount methodsFor: 'main protocol' stamp: 'FR 6/9/2022 12:47:29'!
-is: anAccountToAdd
-	^self = anAccountToAdd.! !
-
 !ReceptiveAccount methodsFor: 'main protocol' stamp: 'FR 6/7/2022 23:22:16'!
 register: aTransaction
 
@@ -404,6 +420,11 @@ register: aTransaction
 transactions 
 
 	^ transactions copy! !
+
+
+!ReceptiveAccount methodsFor: 'private' stamp: 'FR 6/9/2022 16:03:46'!
+contains: anAccountToAdd
+	^self = anAccountToAdd.! !
 
 
 !classDefinition: #AccountTransaction category: 'ServiciosFinancieros-Ejercicio'!
