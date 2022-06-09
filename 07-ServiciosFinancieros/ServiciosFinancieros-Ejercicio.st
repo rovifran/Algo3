@@ -106,7 +106,7 @@ test08PortfolioDoesNotKnowTransactionsOfAnAccountNotInIt
 	
 	self assert: 0 equals: portfolio transactions size.! !
 
-!PortfolioAccountTest methodsFor: 'as yet unclassified' stamp: 'FR 6/9/2022 15:26:36'!
+!PortfolioAccountTest methodsFor: 'as yet unclassified' stamp: 'MBM 6/9/2022 17:16:34'!
 test09CanNotAddAnAccountThatIsAlreadyInThePortfolio
 	| account portfolio |
 	account _ ReceptiveAccount new.
@@ -116,9 +116,9 @@ test09CanNotAddAnAccountThatIsAlreadyInThePortfolio
 	self 
 		should: [portfolio add: account]
 		raise: Error - MessageNotUnderstood 
-		withExceptionDo: [ :anError | anError messageText = PortfolioAccount invalidAccountToAddErrorMessage.]! !
+		withExceptionDo: [ :anError | self assert: anError messageText equals: PortfolioAccount invalidAccountToAddErrorMessage.]! !
 
-!PortfolioAccountTest methodsFor: 'as yet unclassified' stamp: 'FR 6/9/2022 15:26:40'!
+!PortfolioAccountTest methodsFor: 'as yet unclassified' stamp: 'MBM 6/9/2022 17:16:23'!
 test10CanNotAddAnAccountOnAPortfolioWithAnotherPortfolioThatHasTheAccount
 	| account portfolio1 portfolio2 |
 	account _ ReceptiveAccount new.
@@ -130,9 +130,9 @@ test10CanNotAddAnAccountOnAPortfolioWithAnotherPortfolioThatHasTheAccount
 	self
 		should: [ portfolio1 add: account.]
 		raise: Error - MessageNotUnderstood 
-		withExceptionDo: [ :anError | anError messageText = PortfolioAccount invalidAccountToAddErrorMessage ].! !
+		withExceptionDo: [ :anError | self assert: anError messageText equals: PortfolioAccount invalidAccountToAddErrorMessage ].! !
 
-!PortfolioAccountTest methodsFor: 'as yet unclassified' stamp: 'FR 6/9/2022 16:15:49'!
+!PortfolioAccountTest methodsFor: 'as yet unclassified' stamp: 'MBM 6/9/2022 17:16:10'!
 test11CanNotAddAPortfolioInItself
 	| portfolio |
 	portfolio _ PortfolioAccount new.
@@ -140,9 +140,9 @@ test11CanNotAddAPortfolioInItself
 	self
 		should: [portfolio add: portfolio]
 		raise: Error - MessageNotUnderstood 
-		withExceptionDo: [ :anError | anError messageText = PortfolioAccount invalidAccountToAddErrorMessage ]! !
+		withExceptionDo: [ :anError | self assert: anError messageText equals: PortfolioAccount invalidAccountToAddErrorMessage ]! !
 
-!PortfolioAccountTest methodsFor: 'as yet unclassified' stamp: 'FR 6/9/2022 16:15:26'!
+!PortfolioAccountTest methodsFor: 'as yet unclassified' stamp: 'MBM 6/9/2022 17:15:47'!
 test12PortfolioCanNotAddAnotherPortfolioWithAnAccountThatIsAlreadyInIt
 	| account portfolio1 portfolio2 |
 	portfolio1 _ PortfolioAccount new.
@@ -155,7 +155,7 @@ test12PortfolioCanNotAddAnotherPortfolioWithAnAccountThatIsAlreadyInIt
 	self
 		should: [portfolio1 add: portfolio2]
 		raise: Error - MessageNotUnderstood 
-		withExceptionDo: [ :anError | anError messageText = PortfolioAccount invalidAccountToAddErrorMessage ]
+		withExceptionDo: [ :anError | self assert: anError messageText equals: PortfolioAccount invalidAccountToAddErrorMessage ]
 	! !
 
 
