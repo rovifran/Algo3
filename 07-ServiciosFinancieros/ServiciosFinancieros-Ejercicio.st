@@ -106,6 +106,42 @@ test08PortfolioDoesNotKnowTransactionsOfAnAccountNotInIt
 	
 	self assert: 0 equals: portfolio transactions size.! !
 
+!PortfolioAccountTest methodsFor: 'as yet unclassified' stamp: 'FR 6/9/2022 11:22:47'!
+test09CanNotAddAnAccountThatIsAlreadyInThePortfolio
+	| account portfolio |
+	account _ ReceptiveAccount new.
+	portfolio _ PortfolioAccount new.
+	portfolio add: account.
+	
+	self 
+		should: [portfolio add: account]
+		raise: Error - MessageNotUnderstood 
+		withExceptionDo: [ :anError | anError messageText = PortfolioAccount accountAlreadyInPortfolioErrorMessage.]! !
+
+!PortfolioAccountTest methodsFor: 'as yet unclassified' stamp: 'FR 6/9/2022 12:53:10'!
+test10CanNotAddAnAccountOnAPortfolioWithAnotherPortfolioThatHasTheAccount
+	| account portfolio1 portfolio2 |
+	account _ ReceptiveAccount new.
+	portfolio1 _ PortfolioAccount new.
+	portfolio2 _ PortfolioAccount new.
+	
+	portfolio2 add: account.
+	portfolio1 add: portfolio2.
+	self
+		should: [ portfolio1 add: account.]
+		raise: Error - MessageNotUnderstood 
+		withExceptionDo: [ :anError | anError messageText = PortfolioAccount accountAlreadyInPortfolioErrorMessage ].! !
+
+!PortfolioAccountTest methodsFor: 'as yet unclassified' stamp: 'FR 6/9/2022 15:12:28'!
+test11CanNotAddAPortfolioInTheSamePortfolio
+	| portfolio |
+	portfolio _ PortfolioAccount new.
+	
+	self
+		should: [portfolio add: portfolio]
+		raise: Error - MessageNotUnderstood 
+		withExceptionDo: [ :anError | anError messageText = PortfolioAccount cantAddMyselfErrorMessage ]! !
+
 
 !classDefinition: #ReceptiveAccountTest category: 'ServiciosFinancieros-Ejercicio'!
 TestCase subclass: #ReceptiveAccountTest
@@ -273,6 +309,10 @@ balance
 hasRegistered: aTransaction
 	self subclassResponsibility.! !
 
+!Account methodsFor: 'main protocol' stamp: 'FR 6/9/2022 12:51:29'!
+is: anAccountToAdd
+	self subclassResponsibility.! !
+
 !Account methodsFor: 'main protocol' stamp: 'MBM 6/8/2022 22:48:43'!
 transactions
 	self subclassResponsibility.! !
@@ -290,9 +330,19 @@ initialize
 	accounts _ OrderedCollection new.! !
 
 
-!PortfolioAccount methodsFor: 'main protocol' stamp: 'MBM 6/8/2022 23:08:51'!
-add: anAccount 
-	accounts add: anAccount.! !
+!PortfolioAccount methodsFor: 'private' stamp: 'FR 6/9/2022 12:52:27'!
+is: anAccountToAdd
+	self = anAccountToAdd ifTrue: [^true].
+	accounts detect: [ :anAccount | anAccount is: anAccountToAdd ] ifFound: [^true] ifNone: [^false].
+	! !
+
+
+!PortfolioAccount methodsFor: 'main protocol' stamp: 'FR 6/9/2022 13:15:27'!
+add: anAccountToAdd 
+	
+	(self = anAccountToAdd) ifTrue: [self error: self class cantAddMyselfErrorMessage ].
+	(self is: anAccountToAdd) ifTrue: [self error: self class accountAlreadyInPortfolioErrorMessage].
+	accounts add: anAccountToAdd.! !
 
 !PortfolioAccount methodsFor: 'main protocol' stamp: 'MBM 6/6/2022 21:21:16'!
 balance
@@ -307,6 +357,20 @@ transactions
 	^accounts inject: OrderedCollection new into: [ :aCollection :anAccount | aCollection addAll: anAccount transactions].
 	
 	! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'PortfolioAccount class' category: 'ServiciosFinancieros-Ejercicio'!
+PortfolioAccount class
+	instanceVariableNames: ''!
+
+!PortfolioAccount class methodsFor: 'as yet unclassified' stamp: 'FR 6/9/2022 11:21:50'!
+accountAlreadyInPortfolioErrorMessage
+	^'The account is already in the portfolio'! !
+
+!PortfolioAccount class methodsFor: 'as yet unclassified' stamp: 'FR 6/9/2022 12:57:16'!
+cantAddMyselfErrorMessage
+	^'Cant add a portfolio in the same portfolio'.! !
 
 
 !classDefinition: #ReceptiveAccount category: 'ServiciosFinancieros-Ejercicio'!
@@ -330,6 +394,10 @@ hasRegistered: aTransaction
 
 	^ transactions includes: aTransaction 
 ! !
+
+!ReceptiveAccount methodsFor: 'main protocol' stamp: 'FR 6/9/2022 12:47:29'!
+is: anAccountToAdd
+	^self = anAccountToAdd.! !
 
 !ReceptiveAccount methodsFor: 'main protocol' stamp: 'FR 6/7/2022 23:22:16'!
 register: aTransaction
@@ -410,87 +478,8 @@ for: aValue
 	^ self new initializeFor: aValue ! !
 
 
-!classDefinition: #Withdraw category: 'ServiciosFinancieros-Ejercicio'!
-AccountTransaction subclass: #Withdraw
-	instanceVariableNames: 'value'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'ServiciosFinancieros-Ejercicio'!
-
-!Withdraw methodsFor: 'initialization' stamp: 'HernanWilkinson 7/13/2011 18:46'!
-initializeFor: aValue
-
-	value := aValue ! !
-
-
-!Withdraw methodsFor: 'main protocol' stamp: 'MBM 6/2/2022 21:35:48'!
-affectBalance: aBalance
-	^aBalance - self value ! !
-
-!Withdraw methodsFor: 'main protocol' stamp: 'HernanWilkinson 7/13/2011 18:33'!
-value
-
-	^ value! !
-
-"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
-
-!classDefinition: 'Withdraw class' category: 'ServiciosFinancieros-Ejercicio'!
-Withdraw class
-	instanceVariableNames: ''!
-
-!Withdraw class methodsFor: 'instance creation' stamp: 'HernanWilkinson 7/13/2011 18:33'!
-for: aValue
-
-	^ self new initializeFor: aValue ! !
-
-
-!classDefinition: #Transference category: 'ServiciosFinancieros-Ejercicio'!
-Object subclass: #Transference
-	instanceVariableNames: 'value depositLeg withdrawLeg'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'ServiciosFinancieros-Ejercicio'!
-
-!Transference methodsFor: 'initialization' stamp: 'MBM 6/9/2022 00:51:46'!
-initializeFor: anAmountInPesos from: aSenderReceptiveAccount to: aReceiverReceptiveAccount
-	
-	value _ anAmountInPesos.
-	withdrawLeg _ TransferenceWithdraw registerTransference: self on: aSenderReceptiveAccount.
-	depositLeg _ TransferenceDeposit registerTransference: self on: aReceiverReceptiveAccount.! !
-
-
-!Transference methodsFor: 'accessing' stamp: 'MBM 6/9/2022 01:01:31'!
-depositLeg
-	^depositLeg! !
-
-!Transference methodsFor: 'accessing' stamp: 'MBM 6/8/2022 23:16:38'!
-value
-	^ value.! !
-
-!Transference methodsFor: 'accessing' stamp: 'MBM 6/9/2022 01:01:27'!
-withdrawLeg
-	^withdrawLeg! !
-
-"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
-
-!classDefinition: 'Transference class' category: 'ServiciosFinancieros-Ejercicio'!
-Transference class
-	instanceVariableNames: ''!
-
-!Transference class methodsFor: 'error messages' stamp: 'FR 6/8/2022 20:32:25'!
-invalidAmountErrorDescription
-	^'Invalid amount for a transference'! !
-
-
-!Transference class methodsFor: 'instance creation' stamp: 'MBM 6/8/2022 23:33:18'!
-register: anAmountInPesos on: aReceiverReceptiveAccount from: aSenderReceptiveAccount
-
-	(anAmountInPesos <= 0) ifTrue: [self error: self invalidAmountErrorDescription.].
-	^self new initializeFor: anAmountInPesos from: aSenderReceptiveAccount to: aReceiverReceptiveAccount.! !
-
-
 !classDefinition: #TransferenceTransaction category: 'ServiciosFinancieros-Ejercicio'!
-Object subclass: #TransferenceTransaction
+AccountTransaction subclass: #TransferenceTransaction
 	instanceVariableNames: 'transference'
 	classVariableNames: ''
 	poolDictionaries: ''
@@ -594,3 +583,82 @@ TransferenceWithdraw class
 forTransference: aTransference
 	
 	^self new initializeFor: aTransference.! !
+
+
+!classDefinition: #Withdraw category: 'ServiciosFinancieros-Ejercicio'!
+AccountTransaction subclass: #Withdraw
+	instanceVariableNames: 'value'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'ServiciosFinancieros-Ejercicio'!
+
+!Withdraw methodsFor: 'initialization' stamp: 'HernanWilkinson 7/13/2011 18:46'!
+initializeFor: aValue
+
+	value := aValue ! !
+
+
+!Withdraw methodsFor: 'main protocol' stamp: 'MBM 6/2/2022 21:35:48'!
+affectBalance: aBalance
+	^aBalance - self value ! !
+
+!Withdraw methodsFor: 'main protocol' stamp: 'HernanWilkinson 7/13/2011 18:33'!
+value
+
+	^ value! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'Withdraw class' category: 'ServiciosFinancieros-Ejercicio'!
+Withdraw class
+	instanceVariableNames: ''!
+
+!Withdraw class methodsFor: 'instance creation' stamp: 'HernanWilkinson 7/13/2011 18:33'!
+for: aValue
+
+	^ self new initializeFor: aValue ! !
+
+
+!classDefinition: #Transference category: 'ServiciosFinancieros-Ejercicio'!
+Object subclass: #Transference
+	instanceVariableNames: 'value depositLeg withdrawLeg'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'ServiciosFinancieros-Ejercicio'!
+
+!Transference methodsFor: 'initialization' stamp: 'MBM 6/9/2022 00:51:46'!
+initializeFor: anAmountInPesos from: aSenderReceptiveAccount to: aReceiverReceptiveAccount
+	
+	value _ anAmountInPesos.
+	withdrawLeg _ TransferenceWithdraw registerTransference: self on: aSenderReceptiveAccount.
+	depositLeg _ TransferenceDeposit registerTransference: self on: aReceiverReceptiveAccount.! !
+
+
+!Transference methodsFor: 'accessing' stamp: 'MBM 6/9/2022 01:01:31'!
+depositLeg
+	^depositLeg! !
+
+!Transference methodsFor: 'accessing' stamp: 'MBM 6/8/2022 23:16:38'!
+value
+	^ value.! !
+
+!Transference methodsFor: 'accessing' stamp: 'MBM 6/9/2022 01:01:27'!
+withdrawLeg
+	^withdrawLeg! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'Transference class' category: 'ServiciosFinancieros-Ejercicio'!
+Transference class
+	instanceVariableNames: ''!
+
+!Transference class methodsFor: 'error messages' stamp: 'FR 6/8/2022 20:32:25'!
+invalidAmountErrorDescription
+	^'Invalid amount for a transference'! !
+
+
+!Transference class methodsFor: 'instance creation' stamp: 'MBM 6/8/2022 23:33:18'!
+register: anAmountInPesos on: aReceiverReceptiveAccount from: aSenderReceptiveAccount
+
+	(anAmountInPesos <= 0) ifTrue: [self error: self invalidAmountErrorDescription.].
+	^self new initializeFor: anAmountInPesos from: aSenderReceptiveAccount to: aReceiverReceptiveAccount.! !
