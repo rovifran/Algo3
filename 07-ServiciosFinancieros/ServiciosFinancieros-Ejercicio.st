@@ -106,7 +106,7 @@ test08PortfolioDoesNotKnowTransactionsOfAnAccountNotInIt
 	
 	self assert: 0 equals: portfolio transactions size.! !
 
-!PortfolioAccountTest methodsFor: 'as yet unclassified' stamp: 'FR 6/9/2022 11:22:47'!
+!PortfolioAccountTest methodsFor: 'as yet unclassified' stamp: 'FR 6/9/2022 15:26:36'!
 test09CanNotAddAnAccountThatIsAlreadyInThePortfolio
 	| account portfolio |
 	account _ ReceptiveAccount new.
@@ -116,9 +116,9 @@ test09CanNotAddAnAccountThatIsAlreadyInThePortfolio
 	self 
 		should: [portfolio add: account]
 		raise: Error - MessageNotUnderstood 
-		withExceptionDo: [ :anError | anError messageText = PortfolioAccount accountAlreadyInPortfolioErrorMessage.]! !
+		withExceptionDo: [ :anError | anError messageText = PortfolioAccount invalidAccountToAddErrorMessage.]! !
 
-!PortfolioAccountTest methodsFor: 'as yet unclassified' stamp: 'FR 6/9/2022 12:53:10'!
+!PortfolioAccountTest methodsFor: 'as yet unclassified' stamp: 'FR 6/9/2022 15:26:40'!
 test10CanNotAddAnAccountOnAPortfolioWithAnotherPortfolioThatHasTheAccount
 	| account portfolio1 portfolio2 |
 	account _ ReceptiveAccount new.
@@ -130,9 +130,9 @@ test10CanNotAddAnAccountOnAPortfolioWithAnotherPortfolioThatHasTheAccount
 	self
 		should: [ portfolio1 add: account.]
 		raise: Error - MessageNotUnderstood 
-		withExceptionDo: [ :anError | anError messageText = PortfolioAccount accountAlreadyInPortfolioErrorMessage ].! !
+		withExceptionDo: [ :anError | anError messageText = PortfolioAccount invalidAccountToAddErrorMessage ].! !
 
-!PortfolioAccountTest methodsFor: 'as yet unclassified' stamp: 'FR 6/9/2022 15:12:28'!
+!PortfolioAccountTest methodsFor: 'as yet unclassified' stamp: 'FR 6/9/2022 15:26:53'!
 test11CanNotAddAPortfolioInTheSamePortfolio
 	| portfolio |
 	portfolio _ PortfolioAccount new.
@@ -140,7 +140,7 @@ test11CanNotAddAPortfolioInTheSamePortfolio
 	self
 		should: [portfolio add: portfolio]
 		raise: Error - MessageNotUnderstood 
-		withExceptionDo: [ :anError | anError messageText = PortfolioAccount cantAddMyselfErrorMessage ]! !
+		withExceptionDo: [ :anError | anError messageText = PortfolioAccount invalidAccountToAddErrorMessage ]! !
 
 
 !classDefinition: #ReceptiveAccountTest category: 'ServiciosFinancieros-Ejercicio'!
@@ -337,11 +337,10 @@ is: anAccountToAdd
 	! !
 
 
-!PortfolioAccount methodsFor: 'main protocol' stamp: 'FR 6/9/2022 13:15:27'!
+!PortfolioAccount methodsFor: 'main protocol' stamp: 'FR 6/9/2022 15:25:12'!
 add: anAccountToAdd 
 	
-	(self = anAccountToAdd) ifTrue: [self error: self class cantAddMyselfErrorMessage ].
-	(self is: anAccountToAdd) ifTrue: [self error: self class accountAlreadyInPortfolioErrorMessage].
+	(self is: anAccountToAdd) ifTrue: [self error: self class invalidAccountToAddErrorMessage].
 	accounts add: anAccountToAdd.! !
 
 !PortfolioAccount methodsFor: 'main protocol' stamp: 'MBM 6/6/2022 21:21:16'!
@@ -364,13 +363,9 @@ transactions
 PortfolioAccount class
 	instanceVariableNames: ''!
 
-!PortfolioAccount class methodsFor: 'as yet unclassified' stamp: 'FR 6/9/2022 11:21:50'!
-accountAlreadyInPortfolioErrorMessage
-	^'The account is already in the portfolio'! !
-
-!PortfolioAccount class methodsFor: 'as yet unclassified' stamp: 'FR 6/9/2022 12:57:16'!
-cantAddMyselfErrorMessage
-	^'Cant add a portfolio in the same portfolio'.! !
+!PortfolioAccount class methodsFor: 'as yet unclassified' stamp: 'FR 6/9/2022 15:26:14'!
+invalidAccountToAddErrorMessage
+	^'The account to add to the portfolio is already added or is the same portfolio'! !
 
 
 !classDefinition: #ReceptiveAccount category: 'ServiciosFinancieros-Ejercicio'!
