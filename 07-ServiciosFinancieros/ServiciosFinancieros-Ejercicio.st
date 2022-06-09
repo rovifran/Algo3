@@ -13,8 +13,19 @@ test01PortfolioHasZeroAsBalanceWhenCreated
 	
 	self assert: 0 equals: (portfolio balance).! !
 
-!PortfolioAccountTest methodsFor: 'as yet unclassified' stamp: 'FR 6/7/2022 23:26:57'!
-test02PortfolioWithOneAccountHasSameBalanceAsAccount
+!PortfolioAccountTest methodsFor: 'as yet unclassified' stamp: 'FR 6/8/2022 21:24:15'!
+test02PortfolioCanRegisterAccountsAfterCreation
+	| portfolio account |
+	account _ ReceptiveAccount new.
+	portfolio _ PortfolioAccount new.
+	Deposit register: 100 * peso on: account.
+	
+	portfolio register: account .
+	
+	self assert: (100 * peso) equals: portfolio balance.! !
+
+!PortfolioAccountTest methodsFor: 'as yet unclassified' stamp: 'FR 6/8/2022 19:21:32'!
+test03PortfolioWithOneAccountHasSameBalanceAsAccount
 	| account portfolio |
 	account _ ReceptiveAccount  new.
 	Deposit register: 100 * peso on: account.
@@ -24,8 +35,8 @@ test02PortfolioWithOneAccountHasSameBalanceAsAccount
 
 	self assert: account balance equals: portfolio balance.! !
 
-!PortfolioAccountTest methodsFor: 'as yet unclassified' stamp: 'FR 6/7/2022 23:26:57'!
-test03PortfolioBalanceIsEqualToSumOfAccountsBalances
+!PortfolioAccountTest methodsFor: 'as yet unclassified' stamp: 'FR 6/8/2022 19:21:42'!
+test04PortfolioBalanceIsEqualToSumOfAccountsBalances
 	| account1 portfolio account2 |
 	account1 _ ReceptiveAccount  new.
 	Deposit register: 100 * peso on: account1.
@@ -38,8 +49,8 @@ test03PortfolioBalanceIsEqualToSumOfAccountsBalances
 
 	self assert: (account1 balance + account2 balance) equals: portfolio balance.! !
 
-!PortfolioAccountTest methodsFor: 'as yet unclassified' stamp: 'FR 6/7/2022 23:26:57'!
-test04PortfolioKnowsATransactionRegisteredByAnAccountInIt
+!PortfolioAccountTest methodsFor: 'as yet unclassified' stamp: 'FR 6/8/2022 19:21:56'!
+test05PortfolioKnowsATransactionRegisteredByAnAccountInIt
 
 	| account deposit portfolio withdraw |
 	
@@ -53,8 +64,8 @@ test04PortfolioKnowsATransactionRegisteredByAnAccountInIt
 	self assert: (portfolio hasRegistered: withdraw).
 ! !
 
-!PortfolioAccountTest methodsFor: 'as yet unclassified' stamp: 'FR 6/7/2022 23:26:57'!
-test05PortfolioDoesNotKnowADepositNotRegisteredByAnyAccountInIt
+!PortfolioAccountTest methodsFor: 'as yet unclassified' stamp: 'FR 6/8/2022 19:22:05'!
+test06PortfolioDoesNotKnowADepositNotRegisteredByAnyAccountInIt
 
 	| account deposit portfolio withdraw |
 	
@@ -67,8 +78,8 @@ test05PortfolioDoesNotKnowADepositNotRegisteredByAnyAccountInIt
 	self deny: (portfolio hasRegistered: deposit).
 	self deny: (portfolio hasRegistered: withdraw).! !
 
-!PortfolioAccountTest methodsFor: 'as yet unclassified' stamp: 'FR 6/7/2022 23:26:57'!
-test06PortfolioKnowsTransactionsOfAnAccountInIt
+!PortfolioAccountTest methodsFor: 'as yet unclassified' stamp: 'FR 6/8/2022 19:22:15'!
+test07PortfolioKnowsTransactionsOfAnAccountInIt
 
 	| account portfolio withdraw deposit transactions |
 	
@@ -83,8 +94,8 @@ test06PortfolioKnowsTransactionsOfAnAccountInIt
 	self assert: (transactions includes: deposit).
 	self assert: (transactions includes: withdraw).! !
 
-!PortfolioAccountTest methodsFor: 'as yet unclassified' stamp: 'FR 6/7/2022 23:26:57'!
-test07PortfolioDoesNotKnowTransactionsOfAnAccountNotInIt
+!PortfolioAccountTest methodsFor: 'as yet unclassified' stamp: 'FR 6/8/2022 19:22:24'!
+test08PortfolioDoesNotKnowTransactionsOfAnAccountNotInIt
 
 	| account portfolio |
 	
@@ -94,17 +105,6 @@ test07PortfolioDoesNotKnowTransactionsOfAnAccountNotInIt
 	portfolio _ PortfolioAccount new.
 	
 	self assert: 0 equals: portfolio transactions size.! !
-
-!PortfolioAccountTest methodsFor: 'as yet unclassified' stamp: 'FR 6/7/2022 23:26:57'!
-test08PortfolioCanAddAccountsAfterCreation
-	| portfolio account |
-	account _ ReceptiveAccount new.
-	portfolio _ PortfolioAccount new.
-	Deposit register: 100 * peso on: account.
-	
-	portfolio register: account .
-	
-	self assert: (100 * peso) equals: portfolio balance.! !
 
 
 !classDefinition: #ReceptiveAccountTest category: 'ServiciosFinancieros-Ejercicio'!
@@ -205,8 +205,8 @@ TestCase subclass: #TransferenceTest
 	poolDictionaries: ''
 	category: 'ServiciosFinancieros-Ejercicio'!
 
-!TransferenceTest methodsFor: 'as yet unclassified' stamp: 'MBM 6/6/2022 21:27:45'!
-test01PortfolioHasZeroAsBalanceWhenCreated
+!TransferenceTest methodsFor: 'as yet unclassified' stamp: 'FR 6/8/2022 21:08:21'!
+test01DoingATransferenceBetweenAccountsAffectsTheirBalance
 	| receiver sender amount |
 	amount := 100*peso.
 	receiver := ReceptiveAccount  new.
@@ -218,6 +218,20 @@ test01PortfolioHasZeroAsBalanceWhenCreated
 	self assert: 100 * peso equals: receiver balance.
 	self assert: 0*peso equals: sender balance.
 ! !
+
+!TransferenceTest methodsFor: 'as yet unclassified' stamp: 'FR 6/8/2022 21:04:47'!
+test02
+	| sender receiver amount negativeAmount amounts|
+	amount _ 0 * peso.
+	negativeAmount _ -10 * peso.
+	amounts _ OrderedCollection with: amount with: negativeAmount.
+	sender _ ReceptiveAccount new.
+	receiver _ ReceptiveAccount new.
+	
+	
+	amounts do: [ :anInvalidAmount | self should: [Transference from: sender to: receiver for: anInvalidAmount]
+		raise: Error - MessageNotUnderstood 
+		withExceptionDo: [ :anError | self assert: anError messageText = Transference invalidAmountErrorDescription].]! !
 
 
 !classDefinition: #Account category: 'ServiciosFinancieros-Ejercicio'!
@@ -406,3 +420,20 @@ Object subclass: #Transference
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'ServiciosFinancieros-Ejercicio'!
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'Transference class' category: 'ServiciosFinancieros-Ejercicio'!
+Transference class
+	instanceVariableNames: ''!
+
+!Transference class methodsFor: 'error messages' stamp: 'FR 6/8/2022 20:32:25'!
+invalidAmountErrorDescription
+	^'Invalid amount for a transference'! !
+
+
+!Transference class methodsFor: 'unclassified' stamp: 'FR 6/8/2022 21:04:29'!
+from: aReceptiveAccount to: aReceptiveAccount2 for: anAmountInPesos
+	(anAmountInPesos <= 0) ifTrue: [self error: self invalidAmountErrorDescription.].
+	Withdraw register: 100 * peso on: aReceptiveAccount.
+	Deposit register: 100 * peso on: aReceptiveAccount2 .! !
