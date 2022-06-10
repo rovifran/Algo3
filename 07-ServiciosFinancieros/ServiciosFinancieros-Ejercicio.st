@@ -1,42 +1,162 @@
-!classDefinition: #PortfolioTest category: 'ServiciosFinancieros-Ejercicio'!
-TestCase subclass: #PortfolioTest
+!classDefinition: #PortfolioAccountTest category: 'ServiciosFinancieros-Ejercicio'!
+TestCase subclass: #PortfolioAccountTest
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'ServiciosFinancieros-Ejercicio'!
 
-!PortfolioTest methodsFor: 'as yet unclassified' stamp: 'MBM 6/6/2022 21:27:45'!
+!PortfolioAccountTest methodsFor: 'as yet unclassified' stamp: 'FR 6/7/2022 23:26:57'!
 test01PortfolioHasZeroAsBalanceWhenCreated
 	| portfolio |
 	
-	portfolio _ Portfolio new.
+	portfolio _ PortfolioAccount new.
 	
 	self assert: 0 equals: (portfolio balance).! !
 
-!PortfolioTest methodsFor: 'as yet unclassified' stamp: 'MBM 6/6/2022 21:29:14'!
-test02PortfolioWithOneAccountHasSameBalanceAsAccount
-	| cuenta1 portfolio |
-	cuenta1 _ ReceptiveAccount  new.
-	Deposit register: 100 * peso on: cuenta1.
+!PortfolioAccountTest methodsFor: 'as yet unclassified' stamp: 'MBM 6/8/2022 23:09:10'!
+test02PortfolioCanRegisterAccountsAfterCreation
+	| portfolio account |
+	account _ ReceptiveAccount new.
+	portfolio _ PortfolioAccount new.
+	Deposit register: 100 * peso on: account.
 	
-	portfolio _ Portfolio withAccount: cuenta1.
-
-	self assert: cuenta1 balance equals: portfolio balance.! !
-
-!PortfolioTest methodsFor: 'as yet unclassified' stamp: 'MBM 6/6/2022 21:30:23'!
-test03PortfolioBalanceIsEqualToSumOfAccountsBalances
-	| cuenta1 portfolio cuenta2 cuentas |
-	cuenta1 _ ReceptiveAccount  new.
-	Deposit register: 100 * peso on: cuenta1.
-	cuenta2 _ ReceptiveAccount new.
-	Deposit register: 200 * peso on: cuenta2.
-	cuentas _ OrderedCollection new.
-	cuentas add: cuenta1.
-	cuentas add: cuenta2.
+	portfolio add: account .
 	
-	portfolio _ Portfolio withAccounts: cuentas.
+	self assert: (100 * peso) equals: portfolio balance.! !
 
-	self assert: (cuenta1 balance + cuenta2 balance) equals: portfolio balance.! !
+!PortfolioAccountTest methodsFor: 'as yet unclassified' stamp: 'MBM 6/8/2022 23:09:19'!
+test03PortfolioWithOneAccountHasSameBalanceAsAccount
+	| account portfolio |
+	account _ ReceptiveAccount  new.
+	Deposit register: 100 * peso on: account.
+	
+	portfolio _ PortfolioAccount new.
+	portfolio add: account.
+
+	self assert: account balance equals: portfolio balance.! !
+
+!PortfolioAccountTest methodsFor: 'as yet unclassified' stamp: 'MBM 6/8/2022 23:09:27'!
+test04PortfolioBalanceIsEqualToSumOfAccountsBalances
+	| account1 portfolio account2 |
+	account1 _ ReceptiveAccount  new.
+	Deposit register: 100 * peso on: account1.
+	account2 _ ReceptiveAccount new.
+	Deposit register: 200 * peso on: account2.
+	
+	portfolio _ PortfolioAccount new.
+	portfolio add: account1.
+	portfolio add: account2.
+
+	self assert: (account1 balance + account2 balance) equals: portfolio balance.! !
+
+!PortfolioAccountTest methodsFor: 'as yet unclassified' stamp: 'MBM 6/8/2022 23:09:32'!
+test05PortfolioKnowsATransactionRegisteredByAnAccountInIt
+
+	| account deposit portfolio withdraw |
+	
+	account _ ReceptiveAccount new.
+	deposit _ Deposit register: 100 * peso on: account.
+	withdraw _ Withdraw register: 50 * peso on: account.
+	portfolio _ PortfolioAccount new.
+	portfolio add: account.
+		
+	self assert: (portfolio hasRegistered: deposit).
+	self assert: (portfolio hasRegistered: withdraw).
+! !
+
+!PortfolioAccountTest methodsFor: 'as yet unclassified' stamp: 'MBM 6/8/2022 23:09:36'!
+test06PortfolioDoesNotKnowADepositNotRegisteredByAnyAccountInIt
+
+	| account deposit portfolio withdraw |
+	
+	account _ ReceptiveAccount new.
+	deposit _  Deposit for: 100 * peso.
+	withdraw _ Withdraw for: 50 * peso.
+	portfolio _ PortfolioAccount new.
+	portfolio add: account.
+	
+	self deny: (portfolio hasRegistered: deposit).
+	self deny: (portfolio hasRegistered: withdraw).! !
+
+!PortfolioAccountTest methodsFor: 'as yet unclassified' stamp: 'MBM 6/8/2022 23:09:41'!
+test07PortfolioKnowsTransactionsOfAnAccountInIt
+
+	| account portfolio withdraw deposit transactions |
+	
+	account _ ReceptiveAccount new.
+	deposit _  Deposit register: 100 * peso on: account.
+	withdraw _ Withdraw register: 50 * peso on: account.
+	portfolio _ PortfolioAccount new.
+	portfolio add: account.
+	
+	transactions _ portfolio transactions.
+	self assert: 2 equals: transactions size.
+	self assert: (transactions includes: deposit).
+	self assert: (transactions includes: withdraw).! !
+
+!PortfolioAccountTest methodsFor: 'as yet unclassified' stamp: 'FR 6/8/2022 19:22:24'!
+test08PortfolioDoesNotKnowTransactionsOfAnAccountNotInIt
+
+	| account portfolio |
+	
+	account _ ReceptiveAccount new.
+	Deposit register: 100 * peso on: account.
+	Withdraw register: 50 * peso on: account.
+	portfolio _ PortfolioAccount new.
+	
+	self assert: 0 equals: portfolio transactions size.! !
+
+!PortfolioAccountTest methodsFor: 'as yet unclassified' stamp: 'MBM 6/9/2022 17:16:34'!
+test09CanNotAddAnAccountThatIsAlreadyInThePortfolio
+	| account portfolio |
+	account _ ReceptiveAccount new.
+	portfolio _ PortfolioAccount new.
+	portfolio add: account.
+	
+	self 
+		should: [portfolio add: account]
+		raise: Error - MessageNotUnderstood 
+		withExceptionDo: [ :anError | self assert: anError messageText equals: PortfolioAccount invalidAccountToAddErrorMessage.]! !
+
+!PortfolioAccountTest methodsFor: 'as yet unclassified' stamp: 'MBM 6/9/2022 17:16:23'!
+test10CanNotAddAnAccountOnAPortfolioWithAnotherPortfolioThatHasTheAccount
+	| account portfolio1 portfolio2 |
+	account _ ReceptiveAccount new.
+	portfolio1 _ PortfolioAccount new.
+	portfolio2 _ PortfolioAccount new.
+	
+	portfolio2 add: account.
+	portfolio1 add: portfolio2.
+	self
+		should: [ portfolio1 add: account.]
+		raise: Error - MessageNotUnderstood 
+		withExceptionDo: [ :anError | self assert: anError messageText equals: PortfolioAccount invalidAccountToAddErrorMessage ].! !
+
+!PortfolioAccountTest methodsFor: 'as yet unclassified' stamp: 'MBM 6/9/2022 17:16:10'!
+test11CanNotAddAPortfolioInItself
+	| portfolio |
+	portfolio _ PortfolioAccount new.
+	
+	self
+		should: [portfolio add: portfolio]
+		raise: Error - MessageNotUnderstood 
+		withExceptionDo: [ :anError | self assert: anError messageText equals: PortfolioAccount invalidAccountToAddErrorMessage ]! !
+
+!PortfolioAccountTest methodsFor: 'as yet unclassified' stamp: 'MBM 6/9/2022 17:15:47'!
+test12PortfolioCanNotAddAnotherPortfolioWithAnAccountThatIsAlreadyInIt
+	| account portfolio1 portfolio2 |
+	portfolio1 _ PortfolioAccount new.
+	portfolio2 _ PortfolioAccount new.
+	account _ ReceptiveAccount new.
+	
+	portfolio1 add: account.
+	portfolio2 add: account .
+	
+	self
+		should: [portfolio1 add: portfolio2]
+		raise: Error - MessageNotUnderstood 
+		withExceptionDo: [ :anError | self assert: anError messageText equals: PortfolioAccount invalidAccountToAddErrorMessage ]
+	! !
 
 
 !classDefinition: #ReceptiveAccountTest category: 'ServiciosFinancieros-Ejercicio'!
@@ -137,19 +257,174 @@ TestCase subclass: #TransferenceTest
 	poolDictionaries: ''
 	category: 'ServiciosFinancieros-Ejercicio'!
 
-!TransferenceTest methodsFor: 'as yet unclassified' stamp: 'MBM 6/6/2022 21:27:45'!
-test01PortfolioHasZeroAsBalanceWhenCreated
+!TransferenceTest methodsFor: 'as yet unclassified' stamp: 'MBM 6/8/2022 22:52:57'!
+test01DoingATransferenceBetweenAccountsAffectsTheirBalance
 	| receiver sender amount |
-	amount := 100*peso.
+	amount := 100 * peso.
 	receiver := ReceptiveAccount  new.
 	sender := ReceptiveAccount new.
 	Deposit register: amount on: sender.
-	
-	Transference 	from: sender to: receiver for: amount.
-		
+
+	Transference register: amount on: receiver from: sender.
+
 	self assert: 100 * peso equals: receiver balance.
-	self assert: 0*peso equals: sender balance.
+	self assert: 0 * peso equals: sender balance.! !
+
+!TransferenceTest methodsFor: 'as yet unclassified' stamp: 'MBM 6/8/2022 22:55:07'!
+test02CanNotDoATransferenceWithAnInvalidAmmount
+	| sender receiver zeroAmount negativeAmount amounts |
+	zeroAmount _ 0 * peso.
+	negativeAmount _ -10 * peso.
+	amounts _ OrderedCollection with: zeroAmount with: negativeAmount.
+	sender _ ReceptiveAccount new.
+	receiver _ ReceptiveAccount new.
+
+	amounts do: [ :anInvalidAmount | self should: [Transference register: anInvalidAmount on: receiver from: sender]
+		raise: Error - MessageNotUnderstood 
+		withExceptionDo: [ :anError | self assert: anError messageText = Transference invalidAmountErrorDescription].]! !
+
+!TransferenceTest methodsFor: 'as yet unclassified' stamp: 'MBM 6/8/2022 23:05:22'!
+test03ATransferenceKnowsItsValue
+	| sender receiver transference transferenceValue |
+	sender _ ReceptiveAccount new.
+	receiver _ ReceptiveAccount new.
+	transferenceValue _ 100 * peso.
+	transference _ Transference register: transferenceValue on: receiver from: sender.
+
+	self assert: transferenceValue equals: transference value.! !
+
+!TransferenceTest methodsFor: 'as yet unclassified' stamp: 'MBM 6/9/2022 00:57:31'!
+test04ATransferenceTransactionKnowsItsCounterpart
+	| sender receiver transference transferenceValue |
+	sender _ ReceptiveAccount new.
+	receiver _ ReceptiveAccount new.
+	transferenceValue _ 100 * peso.
+	transference _ Transference register: transferenceValue on: receiver from: sender.
+	
+	self assert: transference depositLeg equals: (transference withdrawLeg counterpart).
+	self assert: transference withdrawLeg equals: (transference depositLeg counterpart).! !
+
+
+!classDefinition: #Account category: 'ServiciosFinancieros-Ejercicio'!
+Object subclass: #Account
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'ServiciosFinancieros-Ejercicio'!
+
+!Account methodsFor: 'initialization' stamp: 'MBM 6/8/2022 22:46:31'!
+initialize
+	self subclassResponsibility.! !
+
+
+!Account methodsFor: 'main protocol' stamp: 'MBM 6/8/2022 22:44:41'!
+balance
+	self subclassResponsibility.! !
+
+!Account methodsFor: 'main protocol' stamp: 'MBM 6/8/2022 22:45:32'!
+hasRegistered: aTransaction
+	self subclassResponsibility.! !
+
+!Account methodsFor: 'main protocol' stamp: 'MBM 6/8/2022 22:48:43'!
+transactions
+	self subclassResponsibility.! !
+
+
+!Account methodsFor: 'private' stamp: 'FR 6/9/2022 16:04:11'!
+contains: anAccountToAdd
+	self subclassResponsibility.! !
+
+!Account methodsFor: 'private' stamp: 'FR 6/9/2022 16:03:46'!
+containsAny: aCollectionOfAccounts
+	^aCollectionOfAccounts anySatisfy: [ :anAccount | self contains: anAccount ]! !
+
+
+!classDefinition: #PortfolioAccount category: 'ServiciosFinancieros-Ejercicio'!
+Account subclass: #PortfolioAccount
+	instanceVariableNames: 'accounts'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'ServiciosFinancieros-Ejercicio'!
+
+!PortfolioAccount methodsFor: 'initialization' stamp: 'MBM 6/6/2022 21:15:15'!
+initialize
+	accounts _ OrderedCollection new.! !
+
+
+!PortfolioAccount methodsFor: 'private' stamp: 'FR 6/9/2022 16:03:46'!
+contains: anAccountToAdd
+	^ self = anAccountToAdd or: [	accounts anySatisfy: [ :anAccount | anAccount contains: anAccountToAdd ]]
+	! !
+
+
+!PortfolioAccount methodsFor: 'main protocol' stamp: 'FR 6/9/2022 16:06:44'!
+add: anAccountToAdd 
+	
+	((self contains: anAccountToAdd) or: [anAccountToAdd containsAny: accounts]) ifTrue: [self error: self class invalidAccountToAddErrorMessage].
+	accounts add: anAccountToAdd.! !
+
+!PortfolioAccount methodsFor: 'main protocol' stamp: 'MBM 6/6/2022 21:21:16'!
+balance
+	^accounts inject: 0 into: [ :balance :anAccount | balance + anAccount balance].! !
+
+!PortfolioAccount methodsFor: 'main protocol' stamp: 'MBM 6/7/2022 16:03:23'!
+hasRegistered: aTransaction 
+	^accounts anySatisfy: [ :anAccount | anAccount hasRegistered: aTransaction ].! !
+
+!PortfolioAccount methodsFor: 'main protocol' stamp: 'FR 6/7/2022 23:09:24'!
+transactions
+	^accounts inject: OrderedCollection new into: [ :aCollection :anAccount | aCollection addAll: anAccount transactions].
+	
+	! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'PortfolioAccount class' category: 'ServiciosFinancieros-Ejercicio'!
+PortfolioAccount class
+	instanceVariableNames: ''!
+
+!PortfolioAccount class methodsFor: 'as yet unclassified' stamp: 'FR 6/9/2022 15:26:14'!
+invalidAccountToAddErrorMessage
+	^'The account to add to the portfolio is already added or is the same portfolio'! !
+
+
+!classDefinition: #ReceptiveAccount category: 'ServiciosFinancieros-Ejercicio'!
+Account subclass: #ReceptiveAccount
+	instanceVariableNames: 'transactions'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'ServiciosFinancieros-Ejercicio'!
+
+!ReceptiveAccount methodsFor: 'initialization' stamp: 'FR 6/7/2022 23:17:46'!
+initialize
+	transactions _ OrderedCollection new.! !
+
+
+!ReceptiveAccount methodsFor: 'main protocol' stamp: 'MBM 6/2/2022 21:35:48'!
+balance
+	^transactions inject: 0 into: [ :balance :aTransaction | aTransaction affectBalance: balance ].! !
+
+!ReceptiveAccount methodsFor: 'main protocol' stamp: 'NR 10/17/2019 03:28:43'!
+hasRegistered: aTransaction
+
+	^ transactions includes: aTransaction 
 ! !
+
+!ReceptiveAccount methodsFor: 'main protocol' stamp: 'FR 6/7/2022 23:22:16'!
+register: aTransaction
+
+	transactions add: aTransaction 
+! !
+
+!ReceptiveAccount methodsFor: 'main protocol' stamp: 'HernanWilkinson 7/13/2011 18:37'!
+transactions 
+
+	^ transactions copy! !
+
+
+!ReceptiveAccount methodsFor: 'private' stamp: 'FR 6/9/2022 16:03:46'!
+contains: anAccountToAdd
+	^self = anAccountToAdd.! !
 
 
 !classDefinition: #AccountTransaction category: 'ServiciosFinancieros-Ejercicio'!
@@ -159,15 +434,14 @@ Object subclass: #AccountTransaction
 	poolDictionaries: ''
 	category: 'ServiciosFinancieros-Ejercicio'!
 
-!AccountTransaction methodsFor: 'value' stamp: 'HernanWilkinson 9/12/2011 12:25'!
+!AccountTransaction methodsFor: 'main protocol' stamp: 'MBM 6/2/2022 21:35:48'!
+affectBalance: aBalance
+	self subclassResponsibility.! !
+
+!AccountTransaction methodsFor: 'main protocol' stamp: 'HernanWilkinson 9/12/2011 12:25'!
 value 
 
 	self subclassResponsibility ! !
-
-
-!AccountTransaction methodsFor: 'as yet unclassified' stamp: 'MBM 6/2/2022 21:35:48'!
-affectBalance: aBalance
-	self subclassResponsibility.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -199,11 +473,11 @@ initializeFor: aValue
 	value := aValue ! !
 
 
-!Deposit methodsFor: 'value' stamp: 'MBM 6/2/2022 21:35:48'!
+!Deposit methodsFor: 'main protocol' stamp: 'MBM 6/2/2022 21:35:48'!
 affectBalance: aBalance
 	^aBalance + self value ! !
 
-!Deposit methodsFor: 'value' stamp: 'HernanWilkinson 7/13/2011 18:38'!
+!Deposit methodsFor: 'main protocol' stamp: 'HernanWilkinson 7/13/2011 18:38'!
 value
 
 	^ value! !
@@ -220,6 +494,113 @@ for: aValue
 	^ self new initializeFor: aValue ! !
 
 
+!classDefinition: #TransferenceTransaction category: 'ServiciosFinancieros-Ejercicio'!
+AccountTransaction subclass: #TransferenceTransaction
+	instanceVariableNames: 'transference'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'ServiciosFinancieros-Ejercicio'!
+
+!TransferenceTransaction methodsFor: 'main protocol' stamp: 'MBM 6/9/2022 01:06:17'!
+affectBalance: aBalance
+	self subclassResponsibility ! !
+
+!TransferenceTransaction methodsFor: 'main protocol' stamp: 'MBM 6/9/2022 00:59:38'!
+counterpart
+	self subclassResponsibility ! !
+
+!TransferenceTransaction methodsFor: 'main protocol' stamp: 'MBM 6/9/2022 00:23:01'!
+value
+	^transference value! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'TransferenceTransaction class' category: 'ServiciosFinancieros-Ejercicio'!
+TransferenceTransaction class
+	instanceVariableNames: ''!
+
+!TransferenceTransaction class methodsFor: 'instance creation' stamp: 'MBM 6/9/2022 00:19:39'!
+forTransference: aTransference
+	
+	self subclassResponsibility ! !
+
+!TransferenceTransaction class methodsFor: 'instance creation' stamp: 'MBM 6/9/2022 00:19:24'!
+registerTransference: aTransference on: aReceptiveAccount
+	
+	| transaction |
+	
+	transaction _ self forTransference: aTransference.
+	aReceptiveAccount register: transaction.
+		
+	^ transaction! !
+
+
+!classDefinition: #TransferenceDeposit category: 'ServiciosFinancieros-Ejercicio'!
+TransferenceTransaction subclass: #TransferenceDeposit
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'ServiciosFinancieros-Ejercicio'!
+
+!TransferenceDeposit methodsFor: 'initialization' stamp: 'MBM 6/9/2022 00:27:53'!
+initializeFor: aTransference
+
+	transference _ aTransference.! !
+
+
+!TransferenceDeposit methodsFor: 'main protocol' stamp: 'MBM 6/9/2022 00:22:13'!
+affectBalance: aBalance
+	^aBalance + self value ! !
+
+!TransferenceDeposit methodsFor: 'main protocol' stamp: 'MBM 6/9/2022 00:59:56'!
+counterpart
+	^transference withdrawLeg! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'TransferenceDeposit class' category: 'ServiciosFinancieros-Ejercicio'!
+TransferenceDeposit class
+	instanceVariableNames: ''!
+
+!TransferenceDeposit class methodsFor: 'instance creation' stamp: 'MBM 6/9/2022 00:19:56'!
+forTransference: aTransference
+	
+	^self new initializeFor: aTransference.! !
+
+
+!classDefinition: #TransferenceWithdraw category: 'ServiciosFinancieros-Ejercicio'!
+TransferenceTransaction subclass: #TransferenceWithdraw
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'ServiciosFinancieros-Ejercicio'!
+
+!TransferenceWithdraw methodsFor: 'initialization' stamp: 'MBM 6/9/2022 00:28:01'!
+initializeFor: aTransference
+
+	transference _ aTransference.! !
+
+
+!TransferenceWithdraw methodsFor: 'main protocol' stamp: 'MBM 6/9/2022 00:22:00'!
+affectBalance: aBalance
+	^aBalance - self value ! !
+
+!TransferenceWithdraw methodsFor: 'main protocol' stamp: 'MBM 6/9/2022 01:00:11'!
+counterpart
+	^transference depositLeg! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'TransferenceWithdraw class' category: 'ServiciosFinancieros-Ejercicio'!
+TransferenceWithdraw class
+	instanceVariableNames: ''!
+
+!TransferenceWithdraw class methodsFor: 'instance creation' stamp: 'MBM 6/9/2022 00:20:08'!
+forTransference: aTransference
+	
+	^self new initializeFor: aTransference.! !
+
+
 !classDefinition: #Withdraw category: 'ServiciosFinancieros-Ejercicio'!
 AccountTransaction subclass: #Withdraw
 	instanceVariableNames: 'value'
@@ -233,15 +614,14 @@ initializeFor: aValue
 	value := aValue ! !
 
 
-!Withdraw methodsFor: 'value' stamp: 'HernanWilkinson 7/13/2011 18:33'!
+!Withdraw methodsFor: 'main protocol' stamp: 'MBM 6/2/2022 21:35:48'!
+affectBalance: aBalance
+	^aBalance - self value ! !
+
+!Withdraw methodsFor: 'main protocol' stamp: 'HernanWilkinson 7/13/2011 18:33'!
 value
 
 	^ value! !
-
-
-!Withdraw methodsFor: 'as yet unclassified' stamp: 'MBM 6/2/2022 21:35:48'!
-affectBalance: aBalance
-	^aBalance - self value ! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -255,83 +635,46 @@ for: aValue
 	^ self new initializeFor: aValue ! !
 
 
-!classDefinition: #Portfolio category: 'ServiciosFinancieros-Ejercicio'!
-Object subclass: #Portfolio
-	instanceVariableNames: 'accounts'
+!classDefinition: #Transference category: 'ServiciosFinancieros-Ejercicio'!
+Object subclass: #Transference
+	instanceVariableNames: 'value depositLeg withdrawLeg'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'ServiciosFinancieros-Ejercicio'!
 
-!Portfolio methodsFor: 'initalize' stamp: 'MBM 6/6/2022 21:15:15'!
-initialize
-	accounts _ OrderedCollection new.! !
+!Transference methodsFor: 'initialization' stamp: 'MBM 6/9/2022 00:51:46'!
+initializeFor: anAmountInPesos from: aSenderReceptiveAccount to: aReceiverReceptiveAccount
+	
+	value _ anAmountInPesos.
+	withdrawLeg _ TransferenceWithdraw registerTransference: self on: aSenderReceptiveAccount.
+	depositLeg _ TransferenceDeposit registerTransference: self on: aReceiverReceptiveAccount.! !
 
-!Portfolio methodsFor: 'initalize' stamp: 'MBM 6/6/2022 21:15:09'!
-with: aCollectionOfReceptiveAccounts 
-	aCollectionOfReceptiveAccounts do: [ :aReceptiveAccount | accounts add: aReceptiveAccount ].! !
 
+!Transference methodsFor: 'accessing' stamp: 'MBM 6/9/2022 01:01:31'!
+depositLeg
+	^depositLeg! !
 
-!Portfolio methodsFor: 'accesing' stamp: 'MBM 6/6/2022 21:21:16'!
-balance
-	^accounts inject: 0 into: [ :balance :anAccount | balance + anAccount balance].! !
+!Transference methodsFor: 'accessing' stamp: 'MBM 6/8/2022 23:16:38'!
+value
+	^ value.! !
 
-!Portfolio methodsFor: 'accesing' stamp: 'MBM 6/6/2022 21:13:44'!
-includes: aReceptiveAccount 
-	^accounts = aReceptiveAccount .! !
+!Transference methodsFor: 'accessing' stamp: 'MBM 6/9/2022 01:01:27'!
+withdrawLeg
+	^withdrawLeg! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'Portfolio class' category: 'ServiciosFinancieros-Ejercicio'!
-Portfolio class
+!classDefinition: 'Transference class' category: 'ServiciosFinancieros-Ejercicio'!
+Transference class
 	instanceVariableNames: ''!
 
-!Portfolio class methodsFor: 'hola' stamp: 'MBM 6/6/2022 21:26:12'!
-withAccount: aReceptiveAccount
-	^self new with: (OrderedCollection with: aReceptiveAccount).! !
-
-!Portfolio class methodsFor: 'hola' stamp: 'MBM 6/6/2022 21:25:14'!
-withAccounts: aCollectionOfReceptiveAccounts 
-	^self new with: aCollectionOfReceptiveAccounts.! !
-
-
-!classDefinition: #ReceptiveAccount category: 'ServiciosFinancieros-Ejercicio'!
-Object subclass: #ReceptiveAccount
-	instanceVariableNames: 'transactions'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'ServiciosFinancieros-Ejercicio'!
-
-!ReceptiveAccount methodsFor: 'initialization' stamp: 'NR 10/17/2019 15:06:56'!
-initialize
-
-	transactions := OrderedCollection new.! !
+!Transference class methodsFor: 'error messages' stamp: 'FR 6/8/2022 20:32:25'!
+invalidAmountErrorDescription
+	^'Invalid amount for a transference'! !
 
 
-!ReceptiveAccount methodsFor: 'main protocol' stamp: 'MBM 6/2/2022 21:35:48'!
-balance
-	^transactions inject: 0 into: [ :balance :aTransaction | aTransaction affectBalance: balance ].! !
+!Transference class methodsFor: 'instance creation' stamp: 'MBM 6/8/2022 23:33:18'!
+register: anAmountInPesos on: aReceiverReceptiveAccount from: aSenderReceptiveAccount
 
-!ReceptiveAccount methodsFor: 'main protocol' stamp: 'NR 10/17/2019 03:28:43'!
-hasRegistered: aTransaction
-
-	^ transactions includes: aTransaction 
-! !
-
-!ReceptiveAccount methodsFor: 'main protocol' stamp: 'HernanWilkinson 7/13/2011 18:37'!
-register: aTransaction
-
-	transactions add: aTransaction 
-! !
-
-!ReceptiveAccount methodsFor: 'main protocol' stamp: 'HernanWilkinson 7/13/2011 18:37'!
-transactions 
-
-	^ transactions copy! !
-
-
-!classDefinition: #Transference category: 'ServiciosFinancieros-Ejercicio'!
-Object subclass: #Transference
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'ServiciosFinancieros-Ejercicio'!
+	(anAmountInPesos <= 0) ifTrue: [self error: self invalidAmountErrorDescription.].
+	^self new initializeFor: anAmountInPesos from: aSenderReceptiveAccount to: aReceiverReceptiveAccount.! !
