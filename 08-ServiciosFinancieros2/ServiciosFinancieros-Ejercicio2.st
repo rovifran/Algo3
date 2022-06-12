@@ -1,58 +1,57 @@
-!classDefinition: #AccountSummaryTest category: 'ServiciosFinancieros-Ejercicio2'!
-TestCase subclass: #AccountSummaryTest
+!classDefinition: #AccountSummaryReportTest category: 'ServiciosFinancieros-Ejercicio2'!
+TestCase subclass: #AccountSummaryReportTest
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'ServiciosFinancieros-Ejercicio2'!
 
-!AccountSummaryTest methodsFor: 'testing' stamp: 'FR 6/11/2022 21:13:23'!
+!AccountSummaryReportTest methodsFor: 'testing' stamp: 'FR 6/11/2022 21:29:58'!
 test01SummaryOfNewAccountDoesNotHaveAnyMovementsAndBalanceIs0Pesos
-	| account summary |
+	| account summaryReport |
 	account _ ReceptiveAccount new.
-	summary _ AccountSummary of: account.
+	summaryReport _ AccountSummaryReport of: account.
 	
-	self assert: 'Balance = 0 * pesos' equals: summary representationString.
+	self assert: 'Balance = 0 * pesos' equals: summaryReport representationString.
 	
 	! !
 
-!AccountSummaryTest methodsFor: 'testing' stamp: 'FR 6/11/2022 21:13:23'!
+!AccountSummaryReportTest methodsFor: 'testing' stamp: 'FR 6/11/2022 21:30:05'!
 test02SummaryOfAnAccountWithADepositHasThatDeposit
-	| account summary |
+	| account summaryReport |
 	account _ ReceptiveAccount new.
-	summary _ AccountSummary of: account.
+	summaryReport _ AccountSummaryReport of: account.
 	
 	Deposit register: 100 * peso on: account.
 	self assert: 
 		'Depósito por 100 * pesos
-Balance = 100 * pesos' equals: summary representationString.! !
+Balance = 100 * pesos' equals: summaryReport representationString.! !
 
-!AccountSummaryTest methodsFor: 'testing' stamp: 'FR 6/11/2022 21:13:23'!
+!AccountSummaryReportTest methodsFor: 'testing' stamp: 'FR 6/11/2022 21:30:09'!
 test03SummaryOfAnAccountWithAWithdrawHasThatWithdraw
-	| account summary |
+	| account summaryReport |
 	account _ ReceptiveAccount new.
-	summary _ AccountSummary of: account.
+	summaryReport _ AccountSummaryReport of: account.
 	
 	Withdraw register: 100 * peso on: account.
 	self assert: 'Extracción por 100 * pesos
-Balance = -100 * pesos' equals: summary representationString.
+Balance = -100 * pesos' equals: summaryReport representationString.
 	
 	! !
 
-!AccountSummaryTest methodsFor: 'testing' stamp: 'FR 6/11/2022 21:13:23'!
+!AccountSummaryReportTest methodsFor: 'testing' stamp: 'FR 6/11/2022 21:44:00'!
 test04SummaryOfAnAccountWithATransferLegHasThatTransfer
-	| receiverAccount senderAccount receiverAccountSummary senderAccountSummary |
+	| receiverAccount senderAccount receiverAccountSummaryReport senderAccountSummaryReport |
 	receiverAccount _ ReceptiveAccount new.
 	senderAccount _ ReceptiveAccount new.
 	
-	receiverAccountSummary _ AccountSummary of: receiverAccount.
-	senderAccountSummary _ AccountSummary of: senderAccount.
+	receiverAccountSummaryReport _ AccountSummaryReport of: receiverAccount.
+	senderAccountSummaryReport _ AccountSummaryReport of: senderAccount.
 	
 	Transfer amount: 100 * peso from: senderAccount to: receiverAccount.
-	
-	self assert: 'Salida por transferencia de 100 * pesos
-Balance = -100 * pesos' equals: senderAccountSummary representationString.
+	self assert:'Salida por transferencia de 100 * pesos
+Balance = -100 * pesos' equals: senderAccountSummaryReport representationString.
 	self assert: 'Entrada por transferencia de 100 * pesos
-Balance = 100 * pesos' equals: receiverAccountSummary representationString.
+Balance = 100 * pesos' equals: receiverAccountSummaryReport representationString.
 	! !
 
 
@@ -357,6 +356,62 @@ test07AccountKnowsItsTransactions
 		
 	self assert: 1 equals: account transactions size.
 	self assert: (account transactions includes: deposit).
+! !
+
+
+!classDefinition: #TransferNetReportTest category: 'ServiciosFinancieros-Ejercicio2'!
+TestCase subclass: #TransferNetReportTest
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'ServiciosFinancieros-Ejercicio2'!
+
+!TransferNetReportTest methodsFor: 'as yet unclassified' stamp: 'FR 6/11/2022 22:43:42'!
+test01TransferNetOfANewAccountIs0Pesos
+	| account transferNetReport |
+	account _ ReceptiveAccount new.
+	transferNetReport _ TransferNetReport of: account.
+	
+	self assert: 0 * peso equals: transferNetReport value.
+	! !
+
+!TransferNetReportTest methodsFor: 'as yet unclassified' stamp: 'FR 6/11/2022 22:44:42'!
+test02TransferNetOfAnAccountThatReceivedAnAmountViaATransferIsTheBalanceOfTheAccount
+	| receiverAccount senderAcount transferNetReport |
+	receiverAccount _ ReceptiveAccount new.
+	senderAcount _ ReceptiveAccount new.
+	Transfer amount: 30 * peso from: senderAcount to: receiverAccount .
+	transferNetReport _ TransferNetReport of: receiverAccount.
+	
+	self assert: 30 * peso equals: transferNetReport value.! !
+
+!TransferNetReportTest methodsFor: 'as yet unclassified' stamp: 'FR 6/11/2022 22:45:11'!
+test03TransferNetOfAnAccountThatSentAnAmountViaATransferIsTheBalanceOfTheAccount
+	| receiverAccount senderAccount transferNetReport |
+	receiverAccount _ ReceptiveAccount new.
+	senderAccount _ ReceptiveAccount new.
+	Transfer amount: 30 * peso from: senderAccount to: receiverAccount .
+	transferNetReport _ TransferNetReport of: senderAccount.
+	
+	self assert: -30 * peso equals: transferNetReport value.! !
+
+!TransferNetReportTest methodsFor: 'as yet unclassified' stamp: 'FR 6/11/2022 22:47:42'!
+test04TransferNetIsNotAffectedByADeposit
+	| account transferNetReport |
+	account _ ReceptiveAccount new.
+	Deposit register: 100 * peso on: account.
+	transferNetReport _ TransferNetReport of: account.
+	
+	self assert: 0 * peso equals: transferNetReport value.! !
+
+!TransferNetReportTest methodsFor: 'as yet unclassified' stamp: 'FR 6/11/2022 22:48:14'!
+test05TransferNetIsNotAffectedByAWithdraw
+	| account transferNetReport |
+	account _ ReceptiveAccount new.
+	Withdraw register: 100 * peso on: account.
+	transferNetReport _ TransferNetReport of: account.
+	
+	self assert: 0 * peso equals: transferNetReport value.
 ! !
 
 
@@ -701,21 +756,21 @@ isComposedBy: anAccount
 	^self = anAccount ! !
 
 
-!classDefinition: #AccountSummary category: 'ServiciosFinancieros-Ejercicio2'!
-Object subclass: #AccountSummary
+!classDefinition: #AccountSummaryReport category: 'ServiciosFinancieros-Ejercicio2'!
+Object subclass: #AccountSummaryReport
 	instanceVariableNames: 'account'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'ServiciosFinancieros-Ejercicio2'!
 
-!AccountSummary methodsFor: 'representation' stamp: 'FR 6/11/2022 21:13:23'!
+!AccountSummaryReport methodsFor: 'representation' stamp: 'FR 6/11/2022 21:13:23'!
 representationString
 	
 	| collectionOfRepresentations |
 	collectionOfRepresentations _ self representationsCollection.
 	^String newLineString join: collectionOfRepresentations.! !
 
-!AccountSummary methodsFor: 'representation' stamp: 'FR 6/11/2022 21:14:13'!
+!AccountSummaryReport methodsFor: 'representation' stamp: 'FR 6/11/2022 21:14:13'!
 representationsCollection
 	| collectionOfRepresentations |
 	collectionOfRepresentations _ OrderedCollection new.
@@ -725,17 +780,17 @@ representationsCollection
 	! !
 
 
-!AccountSummary methodsFor: 'private' stamp: 'FR 6/11/2022 18:00:36'!
+!AccountSummaryReport methodsFor: 'private' stamp: 'FR 6/11/2022 18:00:36'!
 ofAccount: aReceptiveAccount
 	account _ aReceptiveAccount.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'AccountSummary class' category: 'ServiciosFinancieros-Ejercicio2'!
-AccountSummary class
+!classDefinition: 'AccountSummaryReport class' category: 'ServiciosFinancieros-Ejercicio2'!
+AccountSummaryReport class
 	instanceVariableNames: ''!
 
-!AccountSummary class methodsFor: 'instance creation' stamp: 'FR 6/11/2022 17:59:56'!
+!AccountSummaryReport class methodsFor: 'instance creation' stamp: 'FR 6/11/2022 17:59:56'!
 of: aReceptiveAccount 
 	^self new ofAccount: aReceptiveAccount.! !
 
@@ -767,6 +822,10 @@ affectBalance: aBalance
 
 	self subclassResponsibility ! !
 
+!AccountTransaction methodsFor: 'balance' stamp: 'FR 6/11/2022 22:41:11'!
+affectTransferNet: aTransferNetBalance
+	self subclassResponsibility.! !
+
 
 !classDefinition: #Deposit category: 'ServiciosFinancieros-Ejercicio2'!
 AccountTransaction subclass: #Deposit
@@ -796,6 +855,10 @@ representationString
 affectBalance: aBalance
 
 	^aBalance + value ! !
+
+!Deposit methodsFor: 'balance' stamp: 'FR 6/11/2022 22:42:25'!
+affectTransferNet: aTransferNetBalance
+	^aTransferNetBalance.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -842,6 +905,11 @@ initializeWith: aTransfer
 !TransferLeg methodsFor: 'initialization' stamp: 'FR 6/11/2022 21:13:23'!
 representationString
 	self subclassResponsibility.! !
+
+
+!TransferLeg methodsFor: 'as yet unclassified' stamp: 'FR 6/11/2022 22:42:02'!
+affectTransferNet: aTransferNetBalance
+	^self affectBalance: aTransferNetBalance.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -931,6 +999,10 @@ value
 affectBalance: aBalance
 
 	^aBalance - value! !
+
+!Withdraw methodsFor: 'balance' stamp: 'FR 6/11/2022 22:42:42'!
+affectTransferNet: aTransferNetBalance
+	^ aTransferNetBalance.! !
 
 
 !Withdraw methodsFor: 'representation' stamp: 'FR 6/11/2022 21:13:23'!
@@ -1051,3 +1123,39 @@ amount: anAmountOfMoney from: originAccount to: destinationAccount
 	
 	
 	! !
+
+
+!classDefinition: #TransferNetReport category: 'ServiciosFinancieros-Ejercicio2'!
+Object subclass: #TransferNetReport
+	instanceVariableNames: 'account'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'ServiciosFinancieros-Ejercicio2'!
+
+!TransferNetReport methodsFor: 'initialization' stamp: 'FR 6/11/2022 22:29:39'!
+ofAccount: aReceptiveAccount 
+	account _ aReceptiveAccount.
+	! !
+
+
+!TransferNetReport methodsFor: 'as yet unclassified' stamp: 'FR 6/11/2022 22:40:31'!
+value
+	| balance |
+	balance _ 0 * peso.
+	account transactions do: [ :aTransaction | balance _ aTransaction affectTransferNet: balance"
+		(aTransaction isKindOf: TransferDepositLeg) ifTrue: [balance _ aTransaction affectBalance: balance].
+		(aTransaction isKindOf: TransferWithdrawLeg) ifTrue: [balance _ aTransaction affectBalance: balance].
+		(aTransaction isKindOf: Deposit) ifTrue: [].
+		(aTransaction isKindOf: Withdraw) ifTrue: []."
+		].
+	^balance! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'TransferNetReport class' category: 'ServiciosFinancieros-Ejercicio2'!
+TransferNetReport class
+	instanceVariableNames: ''!
+
+!TransferNetReport class methodsFor: 'instance creation' stamp: 'FR 6/11/2022 22:26:29'!
+of: aReceptiveAccount 
+	^self new ofAccount: aReceptiveAccount ! !
