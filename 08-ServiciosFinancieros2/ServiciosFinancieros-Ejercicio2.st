@@ -559,7 +559,7 @@ addTransactionsTo: aCollectionOfTransactions
 	self subclassResponsibility ! !
 
 
-!Account methodsFor: 'as yet unclassified' stamp: 'FR 6/11/2022 21:10:05'!
+!Account methodsFor: 'representation' stamp: 'FR 6/11/2022 21:10:05'!
 balanceRepresentation
 	^'Balance = ', self balance asString.! !
 
@@ -754,45 +754,6 @@ addedTo: aPortfolio
 isComposedBy: anAccount
 
 	^self = anAccount ! !
-
-
-!classDefinition: #AccountSummaryReport category: 'ServiciosFinancieros-Ejercicio2'!
-Object subclass: #AccountSummaryReport
-	instanceVariableNames: 'account'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'ServiciosFinancieros-Ejercicio2'!
-
-!AccountSummaryReport methodsFor: 'representation' stamp: 'FR 6/11/2022 21:13:23'!
-representationString
-	
-	| collectionOfRepresentations |
-	collectionOfRepresentations _ self representationsCollection.
-	^String newLineString join: collectionOfRepresentations.! !
-
-!AccountSummaryReport methodsFor: 'representation' stamp: 'FR 6/11/2022 21:14:13'!
-representationsCollection
-	| collectionOfRepresentations |
-	collectionOfRepresentations _ OrderedCollection new.
-	account transactions do: [ :aTransaction | aTransaction addRepresentationTo: collectionOfRepresentations.].
-	collectionOfRepresentations add: account balanceRepresentation.
-	^ collectionOfRepresentations
-	! !
-
-
-!AccountSummaryReport methodsFor: 'private' stamp: 'FR 6/11/2022 18:00:36'!
-ofAccount: aReceptiveAccount
-	account _ aReceptiveAccount.! !
-
-"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
-
-!classDefinition: 'AccountSummaryReport class' category: 'ServiciosFinancieros-Ejercicio2'!
-AccountSummaryReport class
-	instanceVariableNames: ''!
-
-!AccountSummaryReport class methodsFor: 'instance creation' stamp: 'FR 6/11/2022 17:59:56'!
-of: aReceptiveAccount 
-	^self new ofAccount: aReceptiveAccount.! !
 
 
 !classDefinition: #AccountTransaction category: 'ServiciosFinancieros-Ejercicio2'!
@@ -1032,6 +993,69 @@ register: aValue on: account
 	^ transaction! !
 
 
+!classDefinition: #Report category: 'ServiciosFinancieros-Ejercicio2'!
+Object subclass: #Report
+	instanceVariableNames: 'account'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'ServiciosFinancieros-Ejercicio2'!
+
+!Report methodsFor: 'private - initialization' stamp: 'FR 6/12/2022 19:22:26'!
+ofAccount: aReceptiveAccount 
+	account _ aReceptiveAccount.! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'Report class' category: 'ServiciosFinancieros-Ejercicio2'!
+Report class
+	instanceVariableNames: ''!
+
+!Report class methodsFor: 'instance creation' stamp: 'FR 6/12/2022 19:24:56'!
+of: aReceptiveAccount 
+	^self new ofAccount: aReceptiveAccount.! !
+
+
+!classDefinition: #AccountSummaryReport category: 'ServiciosFinancieros-Ejercicio2'!
+Report subclass: #AccountSummaryReport
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'ServiciosFinancieros-Ejercicio2'!
+
+!AccountSummaryReport methodsFor: 'representation' stamp: 'FR 6/11/2022 21:13:23'!
+representationString
+	
+	| collectionOfRepresentations |
+	collectionOfRepresentations _ self representationsCollection.
+	^String newLineString join: collectionOfRepresentations.! !
+
+!AccountSummaryReport methodsFor: 'representation' stamp: 'FR 6/11/2022 21:14:13'!
+representationsCollection
+	| collectionOfRepresentations |
+	collectionOfRepresentations _ OrderedCollection new.
+	account transactions do: [ :aTransaction | aTransaction addRepresentationTo: collectionOfRepresentations.].
+	collectionOfRepresentations add: account balanceRepresentation.
+	^ collectionOfRepresentations
+	! !
+
+
+
+!classDefinition: #TransferNetReport category: 'ServiciosFinancieros-Ejercicio2'!
+Report subclass: #TransferNetReport
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'ServiciosFinancieros-Ejercicio2'!
+
+
+!TransferNetReport methodsFor: 'as yet unclassified' stamp: 'FR 6/12/2022 19:22:57'!
+value
+	| balance |
+	balance _ 0 * peso.
+	account transactions do: [ :aTransaction | balance _ aTransaction affectTransferNet: balance].
+	^balance! !
+
+
 !classDefinition: #Transfer category: 'ServiciosFinancieros-Ejercicio2'!
 Object subclass: #Transfer
 	instanceVariableNames: 'value withdrawLeg depositLeg'
@@ -1123,39 +1147,3 @@ amount: anAmountOfMoney from: originAccount to: destinationAccount
 	
 	
 	! !
-
-
-!classDefinition: #TransferNetReport category: 'ServiciosFinancieros-Ejercicio2'!
-Object subclass: #TransferNetReport
-	instanceVariableNames: 'account'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'ServiciosFinancieros-Ejercicio2'!
-
-!TransferNetReport methodsFor: 'initialization' stamp: 'FR 6/11/2022 22:29:39'!
-ofAccount: aReceptiveAccount 
-	account _ aReceptiveAccount.
-	! !
-
-
-!TransferNetReport methodsFor: 'as yet unclassified' stamp: 'FR 6/11/2022 22:40:31'!
-value
-	| balance |
-	balance _ 0 * peso.
-	account transactions do: [ :aTransaction | balance _ aTransaction affectTransferNet: balance"
-		(aTransaction isKindOf: TransferDepositLeg) ifTrue: [balance _ aTransaction affectBalance: balance].
-		(aTransaction isKindOf: TransferWithdrawLeg) ifTrue: [balance _ aTransaction affectBalance: balance].
-		(aTransaction isKindOf: Deposit) ifTrue: [].
-		(aTransaction isKindOf: Withdraw) ifTrue: []."
-		].
-	^balance! !
-
-"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
-
-!classDefinition: 'TransferNetReport class' category: 'ServiciosFinancieros-Ejercicio2'!
-TransferNetReport class
-	instanceVariableNames: ''!
-
-!TransferNetReport class methodsFor: 'instance creation' stamp: 'FR 6/11/2022 22:26:29'!
-of: aReceptiveAccount 
-	^self new ofAccount: aReceptiveAccount ! !
