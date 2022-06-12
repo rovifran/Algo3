@@ -5,18 +5,18 @@ TestCase subclass: #AccountSummaryTest
 	poolDictionaries: ''
 	category: 'ServiciosFinancieros-Ejercicio2'!
 
-!AccountSummaryTest methodsFor: 'as yet unclassified' stamp: 'FR 6/11/2022 18:54:51'!
-test01
+!AccountSummaryTest methodsFor: 'testing' stamp: 'FR 6/11/2022 21:13:23'!
+test01SummaryOfNewAccountDoesNotHaveAnyMovementsAndBalanceIs0Pesos
 	| account summary |
 	account _ ReceptiveAccount new.
 	summary _ AccountSummary of: account.
 	
-	self assert: 'Balance = 0 * pesos' equals: summary representation.
+	self assert: 'Balance = 0 * pesos' equals: summary representationString.
 	
 	! !
 
-!AccountSummaryTest methodsFor: 'as yet unclassified' stamp: 'FR 6/11/2022 18:21:31'!
-test02
+!AccountSummaryTest methodsFor: 'testing' stamp: 'FR 6/11/2022 21:13:23'!
+test02SummaryOfAnAccountWithADepositHasThatDeposit
 	| account summary |
 	account _ ReceptiveAccount new.
 	summary _ AccountSummary of: account.
@@ -24,22 +24,22 @@ test02
 	Deposit register: 100 * peso on: account.
 	self assert: 
 		'Depósito por 100 * pesos
-Balance = 100 * pesos' equals: summary representation.! !
+Balance = 100 * pesos' equals: summary representationString.! !
 
-!AccountSummaryTest methodsFor: 'as yet unclassified' stamp: 'FR 6/11/2022 18:30:42'!
-test03
+!AccountSummaryTest methodsFor: 'testing' stamp: 'FR 6/11/2022 21:13:23'!
+test03SummaryOfAnAccountWithAWithdrawHasThatWithdraw
 	| account summary |
 	account _ ReceptiveAccount new.
 	summary _ AccountSummary of: account.
 	
 	Withdraw register: 100 * peso on: account.
 	self assert: 'Extracción por 100 * pesos
-Balance = -100 * pesos' equals: summary representation.
+Balance = -100 * pesos' equals: summary representationString.
 	
 	! !
 
-!AccountSummaryTest methodsFor: 'as yet unclassified' stamp: 'FR 6/11/2022 18:44:03'!
-test04
+!AccountSummaryTest methodsFor: 'testing' stamp: 'FR 6/11/2022 21:13:23'!
+test04SummaryOfAnAccountWithATransferLegHasThatTransfer
 	| receiverAccount senderAccount receiverAccountSummary senderAccountSummary |
 	receiverAccount _ ReceptiveAccount new.
 	senderAccount _ ReceptiveAccount new.
@@ -50,27 +50,10 @@ test04
 	Transfer amount: 100 * peso from: senderAccount to: receiverAccount.
 	
 	self assert: 'Salida por transferencia de 100 * pesos
-Balance = -100 * pesos' equals: senderAccountSummary representation.
+Balance = -100 * pesos' equals: senderAccountSummary representationString.
 	self assert: 'Entrada por transferencia de 100 * pesos
-Balance = 100 * pesos' equals: receiverAccountSummary representation.
+Balance = 100 * pesos' equals: receiverAccountSummary representationString.
 	! !
-
-!AccountSummaryTest methodsFor: 'as yet unclassified' stamp: 'FR 6/11/2022 19:17:43'!
-test05
-	| account1 account2 summary |
-	account1 _ ReceptiveAccount new.
-	account2 _ ReceptiveAccount new.
-	Deposit register: 100 * peso on: account1.
-	Withdraw register: 50 * peso on: account1.
-	Transfer amount: 20 * peso from: account1 to: account2.
-	Transfer amount: 30 * peso from: account2 to: account1.
-	
-	summary _ AccountSummary of: account1.
-	self assert: 'Depósito por 100 * pesos
-Extracción por 50 * pesos
-Salida por transferencia de 20 * pesos
-Entrada por transferencia de 30 * pesos
-Balance = 60 * pesos' equals: summary representation.! !
 
 
 !classDefinition: #PortfolioTest category: 'ServiciosFinancieros-Ejercicio2'!
@@ -520,6 +503,11 @@ addTransactionsTo: aCollectionOfTransactions
 
 	self subclassResponsibility ! !
 
+
+!Account methodsFor: 'as yet unclassified' stamp: 'FR 6/11/2022 21:10:05'!
+balanceRepresentation
+	^'Balance = ', self balance asString.! !
+
 
 !classDefinition: #Portfolio category: 'ServiciosFinancieros-Ejercicio2'!
 Account subclass: #Portfolio
@@ -720,24 +708,26 @@ Object subclass: #AccountSummary
 	poolDictionaries: ''
 	category: 'ServiciosFinancieros-Ejercicio2'!
 
-!AccountSummary methodsFor: 'accesing' stamp: 'FR 6/11/2022 18:00:36'!
+!AccountSummary methodsFor: 'representation' stamp: 'FR 6/11/2022 21:13:23'!
+representationString
+	
+	| collectionOfRepresentations |
+	collectionOfRepresentations _ self representationsCollection.
+	^String newLineString join: collectionOfRepresentations.! !
+
+!AccountSummary methodsFor: 'representation' stamp: 'FR 6/11/2022 21:14:13'!
+representationsCollection
+	| collectionOfRepresentations |
+	collectionOfRepresentations _ OrderedCollection new.
+	account transactions do: [ :aTransaction | aTransaction addRepresentationTo: collectionOfRepresentations.].
+	collectionOfRepresentations add: account balanceRepresentation.
+	^ collectionOfRepresentations
+	! !
+
+
+!AccountSummary methodsFor: 'private' stamp: 'FR 6/11/2022 18:00:36'!
 ofAccount: aReceptiveAccount
 	account _ aReceptiveAccount.! !
-
-!AccountSummary methodsFor: 'accesing' stamp: 'FR 6/11/2022 19:08:29'!
-representation
-	| string |
-	string _ ''.
-	account transactions do: [ :aTransaction |
-		(aTransaction isKindOf: Deposit) ifTrue: [string _ string, 'Depósito por ', aTransaction value asString, String newLineString.].
-		
-		(aTransaction isKindOf: Withdraw) ifTrue: [string _ string, 'Extracción por ',aTransaction value asString,String newLineString].
-		
-		(aTransaction isKindOf: TransferDepositLeg) ifTrue: [string _ string, 'Entrada por transferencia de ', aTransaction value asString, String newLineString].
-		
-		(aTransaction isKindOf: TransferWithdrawLeg) ifTrue: [string _ string, 'Salida por transferencia de ', aTransaction value asString, String newLineString].
-].
-	^string,'Balance = ', account balance asString.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -763,6 +753,15 @@ value
 	self subclassResponsibility ! !
 
 
+!AccountTransaction methodsFor: 'representation' stamp: 'FR 6/11/2022 21:13:23'!
+representationString
+	self subclassResponsibility.! !
+
+
+!AccountTransaction methodsFor: 'balance' stamp: 'FR 6/11/2022 21:13:23'!
+addRepresentationTo: aCollection
+	aCollection add: self representationString.! !
+
 !AccountTransaction methodsFor: 'balance' stamp: 'HAW 5/25/2019 11:25:39'!
 affectBalance: aBalance
 
@@ -786,6 +785,11 @@ initializeFor: aValue
 value
 
 	^ value! !
+
+
+!Deposit methodsFor: 'representation' stamp: 'FR 6/11/2022 21:13:23'!
+representationString
+	^'Depósito por ', self value asString.! !
 
 
 !Deposit methodsFor: 'balance' stamp: 'HAW 5/25/2019 11:25:02'!
@@ -829,10 +833,15 @@ value
 	^transfer value! !
 
 
-!TransferLeg methodsFor: 'initialization' stamp: 'LL 9/20/2020 22:28:14'!
+!TransferLeg methodsFor: 'representation' stamp: 'LL 9/20/2020 22:28:14'!
 initializeWith: aTransfer
 
 	transfer := aTransfer! !
+
+
+!TransferLeg methodsFor: 'initialization' stamp: 'FR 6/11/2022 21:13:23'!
+representationString
+	self subclassResponsibility.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -869,6 +878,11 @@ affectBalance: aBalance
 
 	^aBalance + self value! !
 
+
+!TransferDepositLeg methodsFor: 'representation' stamp: 'FR 6/11/2022 21:13:23'!
+representationString
+	^'Entrada por transferencia de ', self value asString.! !
+
 
 !classDefinition: #TransferWithdrawLeg category: 'ServiciosFinancieros-Ejercicio2'!
 TransferLeg subclass: #TransferWithdrawLeg
@@ -881,6 +895,11 @@ TransferLeg subclass: #TransferWithdrawLeg
 depositLeg
 
 	^transfer depositLeg! !
+
+
+!TransferWithdrawLeg methodsFor: 'representation' stamp: 'FR 6/11/2022 21:13:23'!
+representationString
+	^'Salida por transferencia de ', self value asString.! !
 
 
 !TransferWithdrawLeg methodsFor: 'balance' stamp: 'LL 9/20/2020 22:27:55'!
@@ -912,6 +931,11 @@ value
 affectBalance: aBalance
 
 	^aBalance - value! !
+
+
+!Withdraw methodsFor: 'representation' stamp: 'FR 6/11/2022 21:13:23'!
+representationString
+	^'Extracción por ', self value asString.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
