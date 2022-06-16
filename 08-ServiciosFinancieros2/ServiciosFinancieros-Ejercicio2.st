@@ -366,7 +366,7 @@ TestCase subclass: #TransferNetReportTest
 	poolDictionaries: ''
 	category: 'ServiciosFinancieros-Ejercicio2'!
 
-!TransferNetReportTest methodsFor: 'as yet unclassified' stamp: 'FR 6/11/2022 22:43:42'!
+!TransferNetReportTest methodsFor: 'as yet unclassified' stamp: 'FR 6/14/2022 18:06:57'!
 test01TransferNetOfANewAccountIs0Pesos
 	| account transferNetReport |
 	account _ ReceptiveAccount new.
@@ -558,10 +558,6 @@ addTransactionsTo: aCollectionOfTransactions
 
 	self subclassResponsibility ! !
 
-
-!Account methodsFor: 'representation' stamp: 'FR 6/11/2022 21:10:05'!
-balanceRepresentation
-	^'Balance = ', self balance asString.! !
 
 
 !classDefinition: #Portfolio category: 'ServiciosFinancieros-Ejercicio2'!
@@ -769,22 +765,15 @@ value
 	self subclassResponsibility ! !
 
 
-!AccountTransaction methodsFor: 'representation' stamp: 'FR 6/11/2022 21:13:23'!
-representationString
-	self subclassResponsibility.! !
-
-
-!AccountTransaction methodsFor: 'balance' stamp: 'FR 6/11/2022 21:13:23'!
-addRepresentationTo: aCollection
-	aCollection add: self representationString.! !
 
 !AccountTransaction methodsFor: 'balance' stamp: 'HAW 5/25/2019 11:25:39'!
 affectBalance: aBalance
 
 	self subclassResponsibility ! !
 
-!AccountTransaction methodsFor: 'balance' stamp: 'FR 6/11/2022 22:41:11'!
-affectTransferNet: aTransferNetBalance
+
+!AccountTransaction methodsFor: 'as yet unclassified' stamp: 'FR 6/15/2022 20:42:06'!
+accept: aReport
 	self subclassResponsibility.! !
 
 
@@ -807,19 +796,16 @@ value
 	^ value! !
 
 
-!Deposit methodsFor: 'representation' stamp: 'FR 6/11/2022 21:13:23'!
-representationString
-	^'Depósito por ', self value asString.! !
-
 
 !Deposit methodsFor: 'balance' stamp: 'HAW 5/25/2019 11:25:02'!
 affectBalance: aBalance
 
 	^aBalance + value ! !
 
-!Deposit methodsFor: 'balance' stamp: 'FR 6/11/2022 22:42:25'!
-affectTransferNet: aTransferNetBalance
-	^aTransferNetBalance.! !
+
+!Deposit methodsFor: 'as yet unclassified' stamp: 'FR 6/15/2022 20:42:40'!
+accept: aReport
+	^aReport acceptDeposit: self! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -863,14 +849,10 @@ initializeWith: aTransfer
 	transfer := aTransfer! !
 
 
-!TransferLeg methodsFor: 'initialization' stamp: 'FR 6/11/2022 21:13:23'!
-representationString
+
+!TransferLeg methodsFor: 'as yet unclassified' stamp: 'FR 6/15/2022 20:42:58'!
+accept: aReport
 	self subclassResponsibility.! !
-
-
-!TransferLeg methodsFor: 'as yet unclassified' stamp: 'FR 6/11/2022 22:42:02'!
-affectTransferNet: aTransferNetBalance
-	^self affectBalance: aTransferNetBalance.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -908,9 +890,10 @@ affectBalance: aBalance
 	^aBalance + self value! !
 
 
-!TransferDepositLeg methodsFor: 'representation' stamp: 'FR 6/11/2022 21:13:23'!
-representationString
-	^'Entrada por transferencia de ', self value asString.! !
+
+!TransferDepositLeg methodsFor: 'as yet unclassified' stamp: 'FR 6/15/2022 20:43:19'!
+accept: aReport
+	 ^aReport acceptTransferDepositLeg: self.! !
 
 
 !classDefinition: #TransferWithdrawLeg category: 'ServiciosFinancieros-Ejercicio2'!
@@ -926,15 +909,16 @@ depositLeg
 	^transfer depositLeg! !
 
 
-!TransferWithdrawLeg methodsFor: 'representation' stamp: 'FR 6/11/2022 21:13:23'!
-representationString
-	^'Salida por transferencia de ', self value asString.! !
-
 
 !TransferWithdrawLeg methodsFor: 'balance' stamp: 'LL 9/20/2020 22:27:55'!
 affectBalance: aBalance
 
 	^aBalance - self value! !
+
+
+!TransferWithdrawLeg methodsFor: 'as yet unclassified' stamp: 'FR 6/15/2022 20:43:36'!
+accept: aReport
+	^aReport acceptTransferWithdrawLeg: self.! !
 
 
 !classDefinition: #Withdraw category: 'ServiciosFinancieros-Ejercicio2'!
@@ -961,14 +945,11 @@ affectBalance: aBalance
 
 	^aBalance - value! !
 
-!Withdraw methodsFor: 'balance' stamp: 'FR 6/11/2022 22:42:42'!
-affectTransferNet: aTransferNetBalance
-	^ aTransferNetBalance.! !
 
 
-!Withdraw methodsFor: 'representation' stamp: 'FR 6/11/2022 21:13:23'!
-representationString
-	^'Extracción por ', self value asString.! !
+!Withdraw methodsFor: 'as yet unclassified' stamp: 'FR 6/15/2022 20:44:21'!
+accept: aReport
+	^aReport acceptWithdraw: self.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -1000,9 +981,31 @@ Object subclass: #Report
 	poolDictionaries: ''
 	category: 'ServiciosFinancieros-Ejercicio2'!
 
+!Report methodsFor: 'main protocol' stamp: 'FR 6/14/2022 18:05:54'!
+result
+	self subclassResponsibility.! !
+
+
 !Report methodsFor: 'private - initialization' stamp: 'FR 6/12/2022 19:22:26'!
 ofAccount: aReceptiveAccount 
 	account _ aReceptiveAccount.! !
+
+
+!Report methodsFor: 'as yet unclassified' stamp: 'FR 6/15/2022 20:45:54'!
+acceptDeposit: aDeposit
+	self subclassResponsibility.! !
+
+!Report methodsFor: 'as yet unclassified' stamp: 'FR 6/15/2022 20:45:35'!
+acceptTransferDepositLeg: aTransferDepositLeg
+	self subclassResponsibility.! !
+
+!Report methodsFor: 'as yet unclassified' stamp: 'FR 6/15/2022 20:46:10'!
+acceptTransferWithdrawLeg: aTransferWithdrawLeg
+	self subclassResponsibility.! !
+
+!Report methodsFor: 'as yet unclassified' stamp: 'FR 6/15/2022 20:45:03'!
+acceptWithdraw: aWithdraw
+	self subclassResponsibility.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -1022,22 +1025,37 @@ Report subclass: #AccountSummaryReport
 	poolDictionaries: ''
 	category: 'ServiciosFinancieros-Ejercicio2'!
 
-!AccountSummaryReport methodsFor: 'representation' stamp: 'FR 6/11/2022 21:13:23'!
+!AccountSummaryReport methodsFor: 'representation' stamp: 'FR 6/15/2022 21:00:17'!
 representationString
 	
-	| collectionOfRepresentations |
-	collectionOfRepresentations _ self representationsCollection.
-	^String newLineString join: collectionOfRepresentations.! !
+	^String newLineString join: self representationsCollection.! !
 
-!AccountSummaryReport methodsFor: 'representation' stamp: 'FR 6/11/2022 21:14:13'!
+!AccountSummaryReport methodsFor: 'representation' stamp: 'FR 6/15/2022 21:02:47'!
 representationsCollection
 	| collectionOfRepresentations |
 	collectionOfRepresentations _ OrderedCollection new.
-	account transactions do: [ :aTransaction | aTransaction addRepresentationTo: collectionOfRepresentations.].
-	collectionOfRepresentations add: account balanceRepresentation.
+	account transactions do: [ :aTransaction | collectionOfRepresentations add: (aTransaction accept: self)].
+	collectionOfRepresentations add: ('Balance = ', account balance asString).
 	^ collectionOfRepresentations
 	! !
 
+
+!AccountSummaryReport methodsFor: 'private' stamp: 'FR 6/15/2022 20:46:45'!
+acceptTransferWithdrawLeg: aTransferWithdrawLeg
+	^'Salida por transferencia de ', aTransferWithdrawLeg value asString.! !
+
+
+!AccountSummaryReport methodsFor: 'as yet unclassified' stamp: 'FR 6/15/2022 20:54:29'!
+acceptDeposit: aDeposit
+	^'Depósito por ', aDeposit value asString.! !
+
+!AccountSummaryReport methodsFor: 'as yet unclassified' stamp: 'FR 6/15/2022 20:56:58'!
+acceptTransferDepositLeg: aTransferDepositLeg
+	^'Entrada por transferencia de ', aTransferDepositLeg value asString.! !
+
+!AccountSummaryReport methodsFor: 'as yet unclassified' stamp: 'FR 6/15/2022 20:55:52'!
+acceptWithdraw: aWithdraw
+	^'Extracción por ', aWithdraw value asString.! !
 
 
 !classDefinition: #TransferNetReport category: 'ServiciosFinancieros-Ejercicio2'!
@@ -1047,13 +1065,29 @@ Report subclass: #TransferNetReport
 	poolDictionaries: ''
 	category: 'ServiciosFinancieros-Ejercicio2'!
 
-
-!TransferNetReport methodsFor: 'as yet unclassified' stamp: 'FR 6/12/2022 19:22:57'!
+!TransferNetReport methodsFor: 'main protocol' stamp: 'FR 6/15/2022 20:52:24'!
 value
 	| balance |
 	balance _ 0 * peso.
-	account transactions do: [ :aTransaction | balance _ aTransaction affectTransferNet: balance].
+	account transactions do: [ :aTransaction | balance _ balance + (aTransaction accept: self)].
 	^balance! !
+
+
+!TransferNetReport methodsFor: 'as yet unclassified' stamp: 'FR 6/15/2022 20:48:19'!
+acceptDeposit: aDeposit
+	^0.! !
+
+!TransferNetReport methodsFor: 'as yet unclassified' stamp: 'FR 6/15/2022 20:48:58'!
+acceptTransferDepositLeg: aTransferDepositLeg
+	^aTransferDepositLeg value.! !
+
+!TransferNetReport methodsFor: 'as yet unclassified' stamp: 'FR 6/15/2022 20:47:48'!
+acceptTransferWithdrawLeg: aTransferWithdrawLeg
+	^aTransferWithdrawLeg value negated.! !
+
+!TransferNetReport methodsFor: 'as yet unclassified' stamp: 'FR 6/15/2022 20:48:33'!
+acceptWithdraw: aWithdraw
+	^0.! !
 
 
 !classDefinition: #Transfer category: 'ServiciosFinancieros-Ejercicio2'!
